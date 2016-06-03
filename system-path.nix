@@ -5,7 +5,7 @@
 with lib;
 
 let
-  requiredPackages = with pkgs; [ utillinux coreutils iproute iputils procps curl bash ];
+  requiredPackages = with pkgs; [ utillinux coreutils iproute iputils procps curl bash runit ];
 in
 {
   options = {

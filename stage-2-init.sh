@@ -19,16 +19,4 @@ mount -t tmpfs tmpfs /dev/shm
 
 $systemConfig/activate
 
-ip addr add 10.0.2.15 dev eth0
-ip link set eth0 up
-ip route add 10.0.2.0/24 dev eth0
-ip  route add default via 10.0.2.2 dev eth0
-#ln -s /run/current-system/etc/ /etc
-
-#@openssh@/bin/sshd -f @sshd_config@ -d
-
-#curl www.google.com
-sleep 30
-echo o > /proc/sysrq-trigger
-stty erase ^H
-setsid @shell@ < /dev/ttyS0 > /dev/ttyS0 2>&1
+exec runit

@@ -2,18 +2,6 @@
 
 with lib;
 
-let
-  sshd_config = pkgs.writeText "sshd_config" ''
-    HostKey /etc/ssh/ssh_host_rsa_key
-    HostKey /etc/ssh/ssh_host_ed25519_key
-    Port 22
-    PidFile /run/sshd.pid
-    Protocol 2
-    PermitRootLogin yes
-    PasswordAuthentication yes
-    AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u
-  '';
-in
 {
   options = {
     boot = {
@@ -39,8 +27,6 @@ in
       src = ./stage-2-init.sh;
       isExecutable = true;
       path = config.system.path;
-      openssh = pkgs.openssh;
-      sshd_config = sshd_config;
     };
   };
 }

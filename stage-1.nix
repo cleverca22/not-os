@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
   modules = pkgs.makeModulesClosure {
-    rootModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" ];
+    rootModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" "tun" "virtio-rng" ];
     kernel = pkgs.linux;
   };
   bootStage1 = pkgs.writeScript "stage1" ''
@@ -20,9 +20,11 @@ let
     modprobe virtio
     modprobe virtio_pci
     modprobe virtio_net
+    modprobe virtio_rng
 
     modprobe virtio_blk
     modprobe squashfs
+    modprobe tun
     
     for o in $(cat /proc/cmdline); do
       case $o in

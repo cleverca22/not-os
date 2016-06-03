@@ -25,6 +25,7 @@ in
       passwd.text = ''
         root:x:0:0:System administrator:/root:/run/current-system/sw/bin/bash
         sshd:x:498:65534:SSH privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
+        toxvpn:x:1010:65534::/var/lib/toxvpn:/run/current-system/sw/bin/nologin
       '';
       "ssh/authorized_keys.d/root" = {
         text = ''
@@ -45,7 +46,8 @@ in
         -append "console=ttyS0 ${cmdline} quiet panic=-1" -no-reboot \
         -net nic,vlan=0,model=virtio \
         -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22 \
-        -net dump,vlan=0
+        -net dump,vlan=0 \
+        -device virtio-rng-pci
     '';
 
     system.build.dist = pkgs.runCommand "not-os-dist" {} ''
