@@ -1,0 +1,1 @@
+http://wiki.qemu.org/Features-Done/VirtIORNG to improve entropy for toxvpn
