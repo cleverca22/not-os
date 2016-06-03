@@ -7,7 +7,7 @@ let
   bootStage1 = pkgs.writeScript "stage1" ''
     #!${pkgs.stdenv.shell}
     echo
-    echo "[1;32m<<< NixOS Stage 1 >>>[0m"
+    echo "[1;32m<<< NotOS Stage 1 >>>[0m"
     echo
 
     export PATH=${pkgs.busybox}/bin/
