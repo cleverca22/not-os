@@ -3,17 +3,7 @@
 with lib;
 
 let
-  sshd_config = pkgs.writeText "sshd_config" ''
-    HostKey /etc/ssh/ssh_host_rsa_key
-    HostKey /etc/ssh/ssh_host_ed25519_key
-    Port 22
-    PidFile /run/sshd.pid
-    Protocol 2
-    PermitRootLogin yes
-    PasswordAuthentication yes
-    AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u
-  '';
-  cmdline = "init=${config.system.build.bootStage2} systemConfig=${config.system.build.toplevel}";
+  cmdline = "systemConfig=${config.system.build.toplevel}";
 in
 {
   options = {
@@ -24,6 +14,11 @@ in
     };
   };
   config = {
+    nixpkgs.config = {
+      packageOverrides = self: {
+        utillinux = self.utillinux.override { systemd = null; };
+      };
+    };
     environment.etc = {
       profile.text = "export PATH=/run/current-system/sw/bin";
       "resolv.conf".text = "nameserver 10.0.2.3";
@@ -53,43 +48,26 @@ in
         -net dump,vlan=0
     '';
 
-    system.build.bootStage2 =  pkgs.writeScript "init" ''
-      #!${pkgs.stdenv.shell}
-      export PATH=${config.system.path}/bin/
-      mkdir -p /proc /sys /dev /tmp/ssh /var/log /etc /root/
-      mount -t proc proc /proc
-      mount -t sysfs sys /sys
-      mount -t devtmpfs devtmpfs /dev
-      mkdir /dev/pts
-      mount -t devpts devpts /dev/pts
-      ip addr add 10.0.2.15 dev eth0
-      ip link set eth0 up
-      ip route add 10.0.2.0/24 dev eth0
-      ip  route add default via 10.0.2.2 dev eth0
-      #ln -s /run/current-system/etc/ /etc
-      ${pkgs.perl}/bin/perl -I${pkgs.perlPackages.FileSlurp}/lib/perl5/site_perl ${<nixpkgs/nixos/modules/system/etc/setup-etc.pl>} ${config.system.build.etc}/etc
-
-      ${pkgs.openssh}/bin/sshd -f ${sshd_config} -d
-
-      #curl www.google.com
-      #sleep 300
-      echo o > /proc/sysrq-trigger
-      stty erase ^H
-      setsid ${pkgs.stdenv.shell} < /dev/ttyS0 > /dev/ttyS0 2>&1
-    '';
     system.build.dist = pkgs.runCommand "not-os-dist" {} ''
       mkdir $out
       cp ${config.system.build.squashfs} $out/root.squashfs
       cp ${pkgs.linux}/bzImage $out/kernel
-      cp ${config.system.build.initialRamdisk} $out/initrd
+      cp ${config.system.build.initialRamdisk}/initrd $out/initrd
       echo "${cmdline}" > $out/command-line
     '';
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n
-    system.build.toplevel = pkgs.runCommand "not-os" {} ''
+    system.build.toplevel = pkgs.runCommand "not-os" {
+      activationScript = config.system.activationScripts.script;
+    } ''
       mkdir $out
-      ln -s ${config.system.build.bootStage2} $out/init
+      cp ${config.system.build.bootStage2} $out/init
+      substituteInPlace $out/init --subst-var-by systemConfig $out
       ln -s ${config.system.path} $out/sw
+      echo "$activationScript" > $out/activate
+      substituteInPlace $out/activate --subst-var out
+      chmod u+x $out/activate
+      unset activationScript
     '';
     # nix-build -A squashfs && ls -lLh result
     system.build.squashfs = pkgs.callPackage <nixpkgs/nixos/lib/make-squashfs.nix> {

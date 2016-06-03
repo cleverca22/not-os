@@ -15,6 +15,7 @@ rec {
       ./base.nix
       ./system-path.nix
       ./stage-1.nix
+      ./stage-2.nix
       pkgsModule
       <nixpkgs/nixos/modules/system/etc/etc.nix>
       <nixpkgs/nixos/modules/system/activation/activation-script.nix>
@@ -22,4 +23,5 @@ rec {
     ];
     args = {};
   };
+  runner = test1.config.system.build.runvm;
 }

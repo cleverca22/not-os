@@ -6,6 +6,10 @@ let
   };
   bootStage1 = pkgs.writeScript "stage1" ''
     #!${pkgs.stdenv.shell}
+    echo
+    echo "[1;32m<<< NixOS Stage 1 >>>[0m"
+    echo
+
     export PATH=${pkgs.busybox}/bin/
     mkdir -p /proc /sys /dev /etc/udev /tmp /run/ /lib/ /mnt/
     mount -t devtmpfs devtmpfs /dev/
@@ -22,10 +26,6 @@ let
     
     for o in $(cat /proc/cmdline); do
       case $o in
-        init=*)
-          set -- $(IFS==; echo $o)
-          stage2Init=$2
-          ;;
         systemConfig=*)
           set -- $(IFS==; echo $o)
           sysconfig=$2
@@ -34,8 +34,7 @@ let
     done
     mount -t tmpfs root /mnt/
     chmod 755 /mnt/
-    mkdir -p /mnt/nix/store/ /mnt/run/
-    ln -s $sysconfig /mnt/run/current-system
+    mkdir -p /mnt/nix/store/
     
     mount /dev/vda /mnt/nix/store/ -t squashfs
 
