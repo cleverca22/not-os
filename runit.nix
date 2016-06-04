@@ -40,6 +40,7 @@ in
     '';
     "runit/2".source = pkgs.writeScript "2" ''
       #!/bin/sh
+      cat /proc/uptime
       exec runsvdir -P /etc/service
     '';
     "runit/3".source = pkgs.writeScript "3" ''
@@ -49,13 +50,6 @@ in
     "service/sshd/run".source = pkgs.writeScript "sshd_run" ''
       #!/bin/sh
       ${pkgs.openssh}/bin/sshd -f ${sshd_config}
-    '';
-    "service/toxvpn/run".source = pkgs.writeScript "toxvpn_run" ''
-      #!/bin/sh
-      mkdir -p /run/toxvpn /var/lib/toxvpn
-      rm /run/toxvpn/control || true
-      chown toxvpn /var/lib/toxvpn /run/toxvpn
-      ${pkgs.toxvpn}/bin/toxvpn -i 192.168.123.123 -l /run/toxvpn/control -u toxvpn
     '';
     "service/rngd/run".source = pkgs.writeScript "rngd" ''
       #!/bin/sh

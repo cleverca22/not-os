@@ -1,3 +1,5 @@
+{ configuration ? import ./configuration.nix }:
+
 with import <nixpkgs> {};
 
 rec {
@@ -12,6 +14,7 @@ rec {
     prefix = [];
     check = true;
     modules = [
+      configuration
       ./base.nix
       ./system-path.nix
       ./stage-1.nix
