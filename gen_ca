@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir -p ca/signed
+echo 01 > ca/ca.srl
+touch ca/ca.idx
+mkdir ca/signed
+
+openssl genrsa -out ca/root.key 2048
+openssl req -x509 -new -nodes -key ca/root.key -sha256 -days 1024 -out ca/root.pem
+
+openssl req -newkey rsa -nodes -keyout ca/codesign.key -out ca/codesign.req
+openssl ca -config ca.cnf -extensions codesigning -in ca/codesign.req -out ca/codesign.crt
