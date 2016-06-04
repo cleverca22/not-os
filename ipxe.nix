@@ -4,10 +4,12 @@ let
   ipxe_script = pkgs.writeText "script.ipxe" ''
     #!ipxe
     set net0/next-server 10.0.2.2
-    imgfetch tftp://10.0.2.2/kernel console=ttyS0 panic=-1 ${config.system.build.kernel-params}
+    imgfetch tftp://10.0.2.2/kernel root=/root.squashfs console=ttyS0 panic=-1 ${config.system.build.kernel-params}
     imgfetch tftp://10.0.2.2/initrd
+    imgfetch tftp://10.0.2.2/root.squashfs root.squashfs
     imgverify kernel tftp://10.0.2.2/kernel.sig
     imgverify initrd tftp://10.0.2.2/initrd.sig
+    imgverify root.squashfs tftp://10.0.2.2/root.squashfs.sig
     imgselect kernel
 
     prompt --key 0x02 --timeout 5000 Press Ctrl-B for the iPXE command line... && goto loop ||
@@ -34,6 +36,7 @@ let
     mkdir $out
     ln -sv ${config.system.build.dist}/kernel $out/
     ln -sv ${config.system.build.dist}/initrd $out/
+    ln -sv ${config.system.build.dist}/root.squashfs $out/
     ln -sv ${ipxe_script} $out/script.ipxe
     function signit {
       openssl cms -sign -binary -noattr -in $1 -signer ${./ca/codesign.crt} -inkey ${./ca/codesign.key} -certfile ${./ca/root.pem} -outform DER -out ''${1}.sig
@@ -41,6 +44,7 @@ let
     signit $out/kernel
     signit $out/initrd
     signit $out/script.ipxe
+    signit $out/root.squashfs
   '';
   ipxe = pkgs.lib.overrideDerivation pkgs.ipxe (x: {
     script = pkgs.writeText "embed.ipxe" ''
@@ -73,7 +77,6 @@ EOF
     #!${pkgs.stdenv.shell}
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
       -kernel ${ipxe}/ipxe.lkrn -nographic \
-      -drive index=0,id=drive1,file=${config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
       -net nic,vlan=0,model=virtio \
       -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22,tftp=${ftpdir} \
       -net dump,vlan=0 \

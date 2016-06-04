@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
   modules = pkgs.makeModulesClosure {
-    rootModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" "tun" "virtio-rng" ];
+    rootModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" "tun" "virtio-rng" "loop" ];
     kernel = pkgs.linux;
   };
   bootStage1 = pkgs.writeScript "stage1" ''
@@ -25,12 +25,18 @@ let
     modprobe virtio_blk
     modprobe squashfs
     modprobe tun
+    modprobe loop
     
+    root=/dev/vda
     for o in $(cat /proc/cmdline); do
       case $o in
         systemConfig=*)
           set -- $(IFS==; echo $o)
           sysconfig=$2
+          ;;
+        root=*)
+          set -- $(IFS==; echo $o)
+          root=$2
           ;;
       esac
     done
@@ -38,7 +44,7 @@ let
     chmod 755 /mnt/
     mkdir -p /mnt/nix/store/
     
-    mount /dev/vda /mnt/nix/store/ -t squashfs
+    mount $root /mnt/nix/store/ -t squashfs
 
     exec env -i $(type -P switch_root) /mnt/ $sysconfig/init
     exec ${pkgs.stdenv.shell}
