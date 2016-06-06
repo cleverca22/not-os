@@ -27,5 +27,6 @@ in
   closureSizes = {
     toplevel = fetchClosure (cfg: cfg.system.build.toplevel);
     initialRamdisk = fetchClosure (cfg: cfg.system.build.initialRamdisk);
+    squashed = fetchClosure (cfg: cfg.system.build.squashfs);
   };
 }
