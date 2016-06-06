@@ -9,6 +9,20 @@ with lib;
       default = {};
       description = "Attribute set of derivations used to setup the system.";
     };
+    boot.isContainer = mkOption {
+      type = types.bool;
+      default = false;
+    };
+    hardware.firmware = mkOption {
+      type = types.listOf types.package;
+      default = [];
+      apply = list: pkgs.buildEnv {
+        name = "firmware";
+        paths = list;
+        pathsToLink = [ "/lib/firmware" ];
+        ignoreCollisions = true;
+      };
+    };
   };
   config = {
     nixpkgs.config = {
@@ -30,13 +44,13 @@ with lib;
       "ssh/ssh_host_ed25519_key.pub".source = ./ssh/ssh_host_ed25519_key.pub;
       "ssh/ssh_host_ed25519_key" = { mode = "0600"; source = ./ssh/ssh_host_ed25519_key; };
     };
-    system.build.kernel-params = "systemConfig=${config.system.build.toplevel}";
+    boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
     system.build.runvm = pkgs.writeScript "runner" ''
       #!${pkgs.stdenv.shell}
       exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
         -drive index=0,id=drive1,file=${config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
         -kernel ${pkgs.linux}/bzImage -initrd ${config.system.build.initialRamdisk}/initrd -nographic \
-        -append "console=ttyS0 ${config.system.build.kernel-params} quiet panic=-1" -no-reboot \
+        -append "console=ttyS0 ${toString config.boot.kernelParams} quiet panic=-1" -no-reboot \
         -net nic,vlan=0,model=virtio \
         -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22 \
         -net dump,vlan=0 \
@@ -48,7 +62,7 @@ with lib;
       cp ${config.system.build.squashfs} $out/root.squashfs
       cp ${pkgs.linux}/bzImage $out/kernel
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
-      echo "${config.system.build.kernel-params}" > $out/command-line
+      echo "${toString config.boot.kernelParams}" > $out/command-line
     '';
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n

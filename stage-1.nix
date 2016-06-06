@@ -1,7 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   modules = pkgs.makeModulesClosure {
-    rootModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" "tun" "virtio-rng" "loop" ];
+    rootModules = config.boot.initrd.availableKernelModules ++ config.boot.initrd.kernelModules;
+    allowMissing = true;
     kernel = pkgs.linux;
   };
   bootStage1 = pkgs.writeScript "stage1" ''
@@ -23,6 +24,7 @@ let
     modprobe virtio_rng
 
     modprobe virtio_blk
+    modprobe virtio_console
     modprobe squashfs
     modprobe tun
     modprobe loop
@@ -57,5 +59,6 @@ in
   config = {
     system.build.bootStage1 = bootStage1;
     system.build.initialRamdisk = initialRamdisk;
+    boot.initrd.availableKernelModules = [ "squashfs" "virtio" "virtio_pci" "virtio_blk" "virtio_net" "tun" "virtio-rng" "loop" ];
   };
 }

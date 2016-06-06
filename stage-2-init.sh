@@ -8,7 +8,7 @@ echo
 echo -e "\e[1;32m<<< NotOS Stage 2 >>>\e[0m"
 echo
 
-mkdir -p /proc /sys /dev /tmp/ssh /var/log /etc /root /run /nix/var/nix/gcroots
+mkdir -p /proc /sys /dev /tmp /var/log /etc /root /run /nix/var/nix/gcroots
 mount -t proc proc /proc
 mount -t sysfs sys /sys
 mount -t devtmpfs devtmpfs /dev

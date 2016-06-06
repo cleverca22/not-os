@@ -1,7 +1,21 @@
-{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs> }:
+{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [] }:
 
 let
   pkgs = import nixpkgs { config = {}; };
+  baseModules = [
+      ./base.nix
+      ./system-path.nix
+      ./stage-1.nix
+      ./stage-2.nix
+      ./runit.nix
+      (nixpkgs + "/nixos/modules/system/etc/etc.nix")
+      (nixpkgs + "/nixos/modules/system/activation/activation-script.nix")
+      (nixpkgs + "/nixos/modules/misc/nixpkgs.nix")
+      <nixpkgs/nixos/modules/system/boot/kernel.nix>
+      <nixpkgs/nixos/modules/misc/assertions.nix>
+      <nixpkgs/nixos/modules/misc/lib.nix>
+      <nixpkgs/nixos/modules/config/sysctl.nix>
+  ];
 in
 rec {
   pkgsModule = rec {
@@ -16,17 +30,10 @@ rec {
     check = true;
     modules = [
       configuration
-      ./base.nix
-      ./system-path.nix
-      ./stage-1.nix
-      ./stage-2.nix
-      ./runit.nix
       ./ipxe.nix
+      ./systemd-compat.nix
       pkgsModule
-      (nixpkgs + "/nixos/modules/system/etc/etc.nix")
-      (nixpkgs + "/nixos/modules/system/activation/activation-script.nix")
-      (nixpkgs + "/nixos/modules/misc/nixpkgs.nix")
-    ];
+    ] ++ extraModules ++ baseModules;
     args = {};
   };
   runner = test1.config.system.build.runvm;

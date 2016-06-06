@@ -3,16 +3,31 @@
 let
   ipxe_script = pkgs.writeText "script.ipxe" ''
     #!ipxe
-    set net0/next-server 10.0.2.2
-    imgfetch tftp://10.0.2.2/kernel root=/root.squashfs console=ttyS0 panic=-1 ${config.system.build.kernel-params}
-    imgfetch tftp://10.0.2.2/initrd
-    imgfetch tftp://10.0.2.2/root.squashfs root.squashfs
+    :restart
+    menu iPXE boot menu
+    item normal Boot normally
+    item loop Start iPXE shell
+    item off Shutdown
+    item reset Reboot
+    choose --default normal --timeout 5000 res || goto restart
+    goto ''${res}
+
+    :off
+    poweroff
+    goto off
+    :reset
+    reboot
+    goto reset
+
+    :normal
+    imgfree
+    imgfetch tftp://10.0.2.2/kernel root=/root.squashfs console=tty0 console=ttyS0 panic=-1 ${toString config.boot.kernelParams} || goto normal
+    imgfetch tftp://10.0.2.2/initrd || goto normal
+    imgfetch tftp://10.0.2.2/root.squashfs root.squashfs || goto normal
     imgverify kernel tftp://10.0.2.2/kernel.sig
     imgverify initrd tftp://10.0.2.2/initrd.sig
     imgverify root.squashfs tftp://10.0.2.2/root.squashfs.sig
     imgselect kernel
-
-    prompt --key 0x02 --timeout 5000 Press Ctrl-B for the iPXE command line... && goto loop ||
     boot
 
     :loop
@@ -76,11 +91,11 @@ EOF
   testipxe = pkgs.writeScript "runner" ''
     #!${pkgs.stdenv.shell}
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
-      -kernel ${ipxe}/ipxe.lkrn -nographic \
+      -kernel ${ipxe}/ipxe.lkrn  \
       -net nic,vlan=0,model=virtio \
       -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22,tftp=${ftpdir} \
       -net dump,vlan=0 \
-      -device virtio-rng-pci
+      -device virtio-rng-pci -serial stdio
   '';
 in
 {
