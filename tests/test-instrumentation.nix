@@ -26,4 +26,5 @@
     '';
   };
   boot.initrd.availableKernelModules = [ "virtio_console" ];
+  boot.kernelParams = [ "panic=-1" ];
 }
