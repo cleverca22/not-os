@@ -20,7 +20,12 @@ let
   # system instead of generating attributes for all available systems.
   in if args ? system then discover (import fn args)
      else foldAttrs mergeAttrs {} (map discoverForSystem supportedSystems);
+  fetchClosure = f: forAllSystems (system: f (import ./default.nix { inherit system; }).config );
 in
 {
   tests.boot = callSubTests tests/boot.nix {};
+  closureSizes = {
+    toplevel = fetchClosure (cfg: cfg.system.build.toplevel);
+    initialRamdisk = fetchClosure (cfg: cfg.system.build.initialRamdisk);
+  };
 }
