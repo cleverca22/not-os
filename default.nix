@@ -1,7 +1,7 @@
-{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [] }:
+{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [], system ? builtins.currentSystem }:
 
 let
-  pkgs = import nixpkgs { config = {}; };
+  pkgs = import nixpkgs { inherit system; config = {}; };
   baseModules = [
       ./base.nix
       ./system-path.nix
@@ -22,7 +22,7 @@ rec {
     _file = ./default.nix;
     key = _file;
     config = {
-      nixpkgs.system = pkgs.lib.mkDefault builtins.currentSystem;
+      nixpkgs.system = pkgs.lib.mkDefault system;
     };
   };
   test1 = pkgs.lib.evalModules {

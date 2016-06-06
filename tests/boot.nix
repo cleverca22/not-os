@@ -3,7 +3,7 @@
 with import <nixpkgs/nixos/lib/testing.nix> { inherit system; };
 
 let
-  config = (import ./.. { extraModules = [ ./test-instrumentation.nix ]; }).config;
+  config = (import ./.. { inherit system; extraModules = [ ./test-instrumentation.nix ]; }).config;
 in
 {
   ipxeCrypto = makeTest {
