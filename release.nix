@@ -34,7 +34,7 @@ in
     #!/bin/sh
     mkdir -p $out/nix-support
     echo file kernel ''${dist}/kernel > $out/nix-support/hydra-build-products
-    echo file root.squashfs ''${dist}/root.squashfs >> $out/nix-support/hydra-build-products
+    echo file rootfs ''${dist}/root.squashfs >> $out/nix-support/hydra-build-products
     echo file initrd ''${dist}/initrd >> $out/nix-support/hydra-build-products
     echo file command-line ''${dist}/command-line >> $out/nix-support/hydra-build-products
   '');
