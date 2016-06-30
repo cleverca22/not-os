@@ -1,10 +1,11 @@
-{ supportedSystems ? [ "x86_64-linux" "i686-linux" ] }:
+{ supportedSystems ? [ "x86_64-linux" "i686-linux" ], supportedSystems2 ? [ "x86_64-linux" "i686-linux" "armv6l-linux" ] }:
 
 with import <nixpkgs/lib>;
 
 let
   pkgs = import <nixpkgs> { config = {}; };
   forAllSystems = genAttrs supportedSystems;
+  forAllSystems2 = genAttrs supportedSystems2;
   importTest = fn: args: system: import fn ({
     inherit system;
   } // args);
@@ -22,15 +23,16 @@ let
   in if args ? system then discover (import fn args)
      else foldAttrs mergeAttrs {} (map discoverForSystem supportedSystems);
   fetchClosure = f: forAllSystems (system: f (import ./default.nix { inherit system; }).config );
+  fetchClosure2 = f: forAllSystems2 (system: f (import ./default.nix { inherit system; }).config );
 in
 {
   tests.boot = callSubTests tests/boot.nix {};
   closureSizes = {
-    toplevel = fetchClosure (cfg: cfg.system.build.toplevel);
-    initialRamdisk = fetchClosure (cfg: cfg.system.build.initialRamdisk);
-    squashed = fetchClosure (cfg: cfg.system.build.squashfs);
+    toplevel = fetchClosure2 (cfg: cfg.system.build.toplevel);
+    initialRamdisk = fetchClosure2 (cfg: cfg.system.build.initialRamdisk);
+    squashed = fetchClosure2 (cfg: cfg.system.build.squashfs);
   };
-  dist_test = fetchClosure (cfg: pkgs.runCommand "dist" { inherit (cfg.system.build) dist; }''
+  dist_test = fetchClosure2 (cfg: pkgs.runCommand "dist" { inherit (cfg.system.build) dist; }''
     #!/bin/sh
     mkdir -p $out/nix-support
     echo file kernel ''${dist}/kernel > $out/nix-support/hydra-build-products
