@@ -49,7 +49,7 @@ with lib;
       #!${pkgs.stdenv.shell}
       exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
         -drive index=0,id=drive1,file=${config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
-        -kernel ${pkgs.linux}/bzImage -initrd ${config.system.build.initialRamdisk}/initrd -nographic \
+        -kernel ${config.system.build.kernel}/bzImage -initrd ${config.system.build.initialRamdisk}/initrd -nographic \
         -append "console=ttyS0 ${toString config.boot.kernelParams} quiet panic=-1" -no-reboot \
         -net nic,vlan=0,model=virtio \
         -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22 \
@@ -60,7 +60,7 @@ with lib;
     system.build.dist = pkgs.runCommand "not-os-dist" {} ''
       mkdir $out
       cp ${config.system.build.squashfs} $out/root.squashfs
-      cp ${pkgs.linux}/bzImage $out/kernel
+      cp ${pkgs.config.system.build.kernel}/bzImage $out/kernel
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
       echo "${toString config.boot.kernelParams}" > $out/command-line
     '';

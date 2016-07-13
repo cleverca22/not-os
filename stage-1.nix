@@ -3,7 +3,7 @@ let
   modules = pkgs.makeModulesClosure {
     rootModules = config.boot.initrd.availableKernelModules ++ config.boot.initrd.kernelModules;
     allowMissing = true;
-    kernel = pkgs.linux;
+    kernel = config.system.build.kernel;
   };
   bootStage1 = pkgs.writeScript "stage1" ''
     #!${pkgs.stdenv.shell}
