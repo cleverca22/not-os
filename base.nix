@@ -45,6 +45,7 @@ with lib;
       "ssh/ssh_host_ed25519_key" = { mode = "0600"; source = ./ssh/ssh_host_ed25519_key; };
     };
     boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
+    boot.kernelPackages = if pkgs.system == "armv6l-linux" then pkgs.linuxPackages_rpi else pkgs.linuxPackages;
     system.build.runvm = pkgs.writeScript "runner" ''
       #!${pkgs.stdenv.shell}
       exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
