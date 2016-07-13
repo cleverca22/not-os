@@ -60,7 +60,7 @@ with lib;
     system.build.dist = pkgs.runCommand "not-os-dist" {} ''
       mkdir $out
       cp ${config.system.build.squashfs} $out/root.squashfs
-      cp ${pkgs.config.system.build.kernel}/bzImage $out/kernel
+      cp ${config.system.build.kernel}/bzImage $out/kernel
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
       echo "${toString config.boot.kernelParams}" > $out/command-line
     '';
