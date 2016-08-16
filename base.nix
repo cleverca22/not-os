@@ -63,7 +63,7 @@ with lib;
       cp ${config.system.build.squashfs} $out/root.squashfs
       cp ${config.system.build.kernel}/*zImage $out/kernel
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
-      echo "${toString config.boot.kernelParams}" > $out/command-line
+      echo "${builtins.unsafeDiscardStringContext (toString config.boot.kernelParams)}" > $out/command-line
     '';
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n
