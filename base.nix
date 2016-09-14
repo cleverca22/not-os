@@ -46,6 +46,8 @@ with lib;
     };
     boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
     boot.kernelPackages = if pkgs.system == "armv6l-linux" then pkgs.linuxPackages_rpi else pkgs.linuxPackages;
+    system.build.earlyMountScript = pkgs.writeScript "dummy" ''
+    '';
     system.build.runvm = pkgs.writeScript "runner" ''
       #!${pkgs.stdenv.shell}
       exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
