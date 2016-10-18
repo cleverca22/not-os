@@ -78,18 +78,13 @@ let
       ''EMBED=''${script}''
       ''TRUST=''${ca_cert}''
       "CERT=${./ca/codesign.crt},${./ca/root.pem}"
+      #"bin-i386-efi/ipxe.efi" "bin-i386-efi/ipxe.efidrv"
     ];
-    preConfigure = ''
-      cd src
-      cat << EOF > config/local/general.h
-#define CONSOLE_SERIAL
-#define POWEROFF_CMD
-#define IMAGE_TRUST_CMD
-EOF
-    '';
+
+    enabledOptions = x.enabledOptions ++ [ "CONSOLE_SERIAL" "POWEROFF_CMD" "IMAGE_TRUST_CMD" ];
   });
   testipxe = pkgs.writeScript "runner" ''
-    #!${pkgs.stdenv.shell}
+		#!${pkgs.stdenv.shell}
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
       -kernel ${ipxe}/ipxe.lkrn  \
       -net nic,vlan=0,model=virtio \
