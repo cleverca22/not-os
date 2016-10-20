@@ -28,7 +28,7 @@ with lib;
     nixpkgs.config = {
       packageOverrides = self: {
         utillinux = self.utillinux.override { systemd = null; };
-        toxvpn = self.toxvpn.overrideDerivation (x: { cmakeFlags = [ "-DSTATIC=1" ]; nativeBuildInputs = lib.filter (y: y.name != "systemd-230") x.nativeBuildInputs; });
+        toxvpn = self.toxvpn.override { systemd = null; };
       };
     };
     environment.etc = {
