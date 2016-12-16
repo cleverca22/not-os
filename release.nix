@@ -22,8 +22,10 @@ let
   # system instead of generating attributes for all available systems.
   in if args ? system then discover (import fn args)
      else foldAttrs mergeAttrs {} (map discoverForSystem supportedSystems);
+  platforms = import <nixpkgs/pkgs/top-level/platforms.nix>;
+  platformForSystem = system: if system == "armv7l-linux" then platforms.raspberrypi2 else null;
   fetchClosure = f: forAllSystems (system: f (import ./default.nix { inherit system; }).config );
-  fetchClosure2 = f: forAllSystems2 (system: f (import ./default.nix { inherit system; }).config );
+  fetchClosure2 = f: forAllSystems2 (system: f (import ./default.nix { inherit system; platform = platformForSystem system; }).config );
 in
 {
   tests.boot = callSubTests tests/boot.nix {};
@@ -32,12 +34,19 @@ in
     initialRamdisk = fetchClosure2 (cfg: cfg.system.build.initialRamdisk);
     squashed = fetchClosure2 (cfg: cfg.system.build.squashfs);
   };
-  dist_test = fetchClosure2 (cfg: pkgs.runCommand "dist" { inherit (cfg.system.build) dist; }''
+  dist_test = fetchClosure2 (cfg: pkgs.runCommand "dist" { inherit (cfg.system.build) dist kernel; config = cfg.system.build.kernel.configfile; }''
     #!/bin/sh
     mkdir -p $out/nix-support
     echo file kernel ''${dist}/kernel > $out/nix-support/hydra-build-products
     echo file rootfs ''${dist}/root.squashfs >> $out/nix-support/hydra-build-products
     echo file initrd ''${dist}/initrd >> $out/nix-support/hydra-build-products
     echo file command-line ''${dist}/command-line >> $out/nix-support/hydra-build-products
+    cd $out
+    ln -sv ''${dist}/initrd
+    ln -sv ''${dist}/kernel
+    ln -sv ''${dist}/root.squashfs
+    ln -sv ''${config} config
+    for x in $kernel/dtbs/*;do ln -sv $x $out/;done
   '');
+  rpi_image = (import ./default.nix { extraModules = [ ./rpi_image.nix ]; platform = system: platforms.raspberrypi2; }).config.system.build.rpi_image;
 }

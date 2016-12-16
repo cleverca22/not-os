@@ -23,21 +23,69 @@ with lib;
         ignoreCollisions = true;
       };
     };
+    not-os.nix = mkOption {
+      type = types.bool;
+      description = "enable nix-daemon and a writeable store";
+    };
   };
   config = {
+    environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
     nixpkgs.config = {
       packageOverrides = self: {
         utillinux = self.utillinux.override { systemd = null; };
         toxvpn = self.toxvpn.override { systemd = null; };
+        linux_rpixxx = self.linux_rpi.override {
+          extraConfig = ''
+            DEBUG_LL y
+            EARLY_PRINTK y
+            DEBUG_BCM2708_UART0 y
+            ARM_APPENDED_DTB n
+            ARM_ATAG_DTB_COMPAT n
+            ARCH_BCM2709 y
+            BCM2708_GPIO y
+            BCM2708_NOL2CACHE y
+            BCM2708_SPIDEV y
+          '';
+        };
       };
     };
     environment.etc = {
+      "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
+        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.stdenv.shell}); do if test -d $i; then echo $i; fi; done)
+        cat > $out << EOF
+        build-use-sandbox = true
+        build-users-group = nixbld
+        build-sandbox-paths = /bin/sh=${pkgs.stdenv.shell} $(echo $extraPaths)
+        build-max-jobs = 1
+        build-cores = 4
+        EOF
+      '';
+      bashrc.text = "export PATH=/run/current-system/sw/bin";
       profile.text = "export PATH=/run/current-system/sw/bin";
       "resolv.conf".text = "nameserver 10.0.2.3";
       passwd.text = ''
         root:x:0:0:System administrator:/root:/run/current-system/sw/bin/bash
         sshd:x:498:65534:SSH privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
         toxvpn:x:1010:65534::/var/lib/toxvpn:/run/current-system/sw/bin/nologin
+        nixbld1:x:30001:30000:Nix build user 1:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld2:x:30002:30000:Nix build user 2:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld3:x:30003:30000:Nix build user 3:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld4:x:30004:30000:Nix build user 4:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld5:x:30005:30000:Nix build user 5:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld6:x:30006:30000:Nix build user 6:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld7:x:30007:30000:Nix build user 7:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld8:x:30008:30000:Nix build user 8:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld9:x:30009:30000:Nix build user 9:/var/empty:/run/current-system/sw/bin/nologin
+        nixbld10:x:30010:30000:Nix build user 10:/var/empty:/run/current-system/sw/bin/nologin
+      '';
+      "nsswitch.conf".text = ''
+        hosts:     files  dns   myhostname mymachines
+        networks:  files dns
+      '';
+      "services".source = pkgs.iana_etc + "/etc/services";
+      group.text = ''
+        root:x:0:
+        nixbld:x:30000:nixbld1,nixbld10,nixbld2,nixbld3,nixbld4,nixbld5,nixbld6,nixbld7,nixbld8,nixbld9
       '';
       "ssh/ssh_host_rsa_key.pub".source = ./ssh/ssh_host_rsa_key.pub;
       "ssh/ssh_host_rsa_key" = { mode = "0600"; source = ./ssh/ssh_host_rsa_key; };
@@ -45,7 +93,7 @@ with lib;
       "ssh/ssh_host_ed25519_key" = { mode = "0600"; source = ./ssh/ssh_host_ed25519_key; };
     };
     boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
-    boot.kernelPackages = if pkgs.system == "armv6l-linux" then pkgs.linuxPackages_rpi else pkgs.linuxPackages;
+    boot.kernelPackages = if pkgs.system == "armv7l-linux" then pkgs.linuxPackages_rpi else pkgs.linuxPackages;
     system.build.earlyMountScript = pkgs.writeScript "dummy" ''
     '';
     system.build.runvm = pkgs.writeScript "runner" ''

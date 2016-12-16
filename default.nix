@@ -1,12 +1,13 @@
-{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [], system ? builtins.currentSystem }:
+{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [], system ? builtins.currentSystem, platform ? null }:
 
 let
-  pkgs = import nixpkgs { inherit system; config = {}; };
+  pkgs = import nixpkgs { inherit system; platform = platform; config = {}; };
   pkgsModule = rec {
     _file = ./default.nix;
     key = _file;
     config = {
       nixpkgs.system = pkgs.lib.mkDefault system;
+      nixpkgs.config.platform = platform;
     };
   };
   baseModules = [
@@ -22,7 +23,6 @@ let
       <nixpkgs/nixos/modules/misc/assertions.nix>
       <nixpkgs/nixos/modules/misc/lib.nix>
       <nixpkgs/nixos/modules/config/sysctl.nix>
-      <nixpkgs/nixos/modules/system/boot/kernel.nix>
       ./ipxe.nix
       ./systemd-compat.nix
       pkgsModule

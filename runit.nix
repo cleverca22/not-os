@@ -29,14 +29,20 @@ in
   environment.etc = {
     "runit/1".source = pkgs.writeScript "1" ''
       #!${pkgs.stdenv.shell}
-      ip addr add 10.0.2.15 dev eth0
-      ip link set eth0 up
-      ip route add 10.0.2.0/24 dev eth0
-      ip  route add default via 10.0.2.2 dev eth0
+      # ip addr add 10.0.2.15 dev eth0
+      # ip link set eth0 up
+      # ip route add 10.0.2.0/24 dev eth0
+      # ip  route add default via 10.0.2.2 dev eth0
       mkdir /bin/
       ln -s ${pkgs.stdenv.shell} /bin/sh
+      ${pkgs.ntp}/bin/ntpdate 192.168.2.1
+
+      # disable DPMS on tty's
+      echo -ne "\033[9;0]" > /dev/tty0
+
       touch /etc/runit/stopit
       chmod 0 /etc/runit/stopit
+      # ${pkgs.dhcpcd.override { udev = null; }}/sbin/dhcpcd
     '';
     "runit/2".source = pkgs.writeScript "2" ''
       #!/bin/sh
@@ -55,6 +61,11 @@ in
       #!/bin/sh
       export PATH=$PATH:${pkgs.rng_tools}/bin
       exec rngd -r /dev/hwrng
+    '';
+    "service/nix/run".source = pkgs.writeScript "nix" ''
+      #!/bin/sh
+      nix-store --load-db < /nix/store/nix-path-registration
+      nix-daemon
     '';
   };
 }
