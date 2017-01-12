@@ -7,7 +7,6 @@ let
     key = _file;
     config = {
       nixpkgs.system = pkgs.lib.mkDefault system;
-      nixpkgs.config.platform = platform;
     };
   };
   baseModules = [
