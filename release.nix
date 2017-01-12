@@ -48,5 +48,5 @@ in
     ln -sv ''${config} config
     for x in $kernel/dtbs/*;do ln -sv $x $out/;done
   '');
-  rpi_image = (import ./default.nix { extraModules = [ ./rpi_image.nix ]; platform = system: platforms.raspberrypi2; }).config.system.build.rpi_image;
+  #rpi_image = (import ./default.nix { extraModules = [ ./rpi_image.nix ]; platform = system: platforms.raspberrypi2; }).config.system.build.rpi_image;
 }
