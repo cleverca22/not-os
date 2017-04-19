@@ -2,7 +2,7 @@
 
 {
   environment.etc = {
-    "service/backdoor/run".source = pkgs.writeScript "toxvpn_run" ''
+    "service/backdoor/run".source = pkgs.writeScript "backdoor_run" ''
       #!/bin/sh
       export USER=root
       export HOME=/root

@@ -33,7 +33,6 @@ with lib;
     nixpkgs.config = {
       packageOverrides = self: {
         utillinux = self.utillinux.override { systemd = null; };
-        toxvpn = self.toxvpn.override { systemd = null; };
         linux_rpixxx = self.linux_rpi.override {
           extraConfig = ''
             DEBUG_LL y
