@@ -22,7 +22,7 @@ let
   # system instead of generating attributes for all available systems.
   in if args ? system then discover (import fn args)
      else foldAttrs mergeAttrs {} (map discoverForSystem supportedSystems);
-  platforms = import <nixpkgs/pkgs/top-level/platforms.nix>;
+  platforms = (import <nixpkgs> { config = {}; }).platforms;
   platformForSystem = system: if system == "armv7l-linux" then platforms.raspberrypi2 else null;
   fetchClosure = f: forAllSystems (system: f (import ./default.nix { inherit system; }).config );
   fetchClosure2 = f: forAllSystems2 (system: f (import ./default.nix { inherit system; platform = platformForSystem system; }).config );

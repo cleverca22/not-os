@@ -84,7 +84,7 @@ let
     enabledOptions = x.enabledOptions ++ [ "CONSOLE_SERIAL" "POWEROFF_CMD" "IMAGE_TRUST_CMD" ];
   });
   testipxe = pkgs.writeScript "runner" ''
-		#!${pkgs.stdenv.shell}
+    #!${pkgs.stdenv.shell}
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name not-os -m 512 \
       -kernel ${ipxe}/ipxe.lkrn  \
       -net nic,vlan=0,model=virtio \
