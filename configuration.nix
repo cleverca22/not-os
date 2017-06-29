@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
 {
+  imports = [ ./qemu.nix ];
   not-os.nix = true;
   environment.systemPackages = [ pkgs.utillinux ];
   environment.etc = {
