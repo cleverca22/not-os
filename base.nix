@@ -114,6 +114,13 @@ with lib;
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
       echo "${builtins.unsafeDiscardStringContext (toString config.boot.kernelParams)}" > $out/command-line
     '';
+    
+    system.activationScripts.users = ''
+      # dummy to make setup-etc happy
+    '';
+    system.activationScripts.groups = ''
+      # dummy to make setup-etc happy
+    '';
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n
     system.build.toplevel = pkgs.runCommand "not-os" {
