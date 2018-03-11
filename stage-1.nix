@@ -4,6 +4,7 @@ let
     rootModules = config.boot.initrd.availableKernelModules ++ config.boot.initrd.kernelModules;
     allowMissing = true;
     kernel = config.system.build.kernel;
+    firmware = config.hardware.firmware;
   };
   plymouth = (pkgs.plymouth.override {
     udev = null;
