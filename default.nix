@@ -6,7 +6,7 @@ let
     _file = ./default.nix;
     key = _file;
     config = {
-      nixpkgs.system = pkgs.lib.mkDefault system;
+      nixpkgs.localSystem = { inherit system; };
     };
   };
   baseModules = [
