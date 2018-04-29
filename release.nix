@@ -34,6 +34,7 @@ in
     initialRamdisk = fetchClosure2 (cfg: cfg.system.build.initialRamdisk);
     squashed = fetchClosure2 (cfg: cfg.system.build.squashfs);
   };
+  raspberrypi-tools = (import <nixpkgs> { config = {}; system = "armv7l-linux"; }).raspberrypi-tools;
   dist_test = fetchClosure2 (cfg: pkgs.runCommand "dist" { inherit (cfg.system.build) dist kernel; config = cfg.system.build.kernel.configfile; }''
     #!/bin/sh
     mkdir -p $out/nix-support
