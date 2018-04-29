@@ -33,6 +33,7 @@ with lib;
     nixpkgs.config = {
       packageOverrides = self: {
         utillinux = self.utillinux.override { systemd = null; };
+        dhcpcd = self.dhcpcd.override { udev = null; };
         linux_rpixxx = self.linux_rpi.override {
           extraConfig = ''
             DEBUG_LL y
