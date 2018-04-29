@@ -42,7 +42,7 @@ in
 
       touch /etc/runit/stopit
       chmod 0 /etc/runit/stopit
-      # ${pkgs.dhcpcd.override { udev = null; }}/sbin/dhcpcd
+      ${if true then "" else "${pkgs.dhcpcd}/sbin/dhcpcd"}
     '';
     "runit/2".source = pkgs.writeScript "2" ''
       #!/bin/sh
