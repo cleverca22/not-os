@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
 
 let
   sshd_config = pkgs.writeText "sshd_config" ''
@@ -29,10 +29,12 @@ in
   environment.etc = {
     "runit/1".source = pkgs.writeScript "1" ''
       #!${pkgs.stdenv.shell}
-      # ip addr add 10.0.2.15 dev eth0
-      # ip link set eth0 up
-      # ip route add 10.0.2.0/24 dev eth0
-      # ip  route add default via 10.0.2.2 dev eth0
+      ${lib.optionalString config.not-os.simpleStaticIp ''
+      ip addr add 10.0.2.15 dev eth0
+      ip link set eth0 up
+      ip route add 10.0.2.0/24 dev eth0
+      ip  route add default via 10.0.2.2 dev eth0
+      ''}
       mkdir /bin/
       ln -s ${pkgs.stdenv.shell} /bin/sh
       ${pkgs.ntp}/bin/ntpdate 192.168.2.1

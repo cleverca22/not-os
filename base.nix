@@ -27,6 +27,11 @@ with lib;
       type = types.bool;
       description = "enable nix-daemon and a writeable store";
     };
+    not-os.simpleStaticIp = mkOption {
+      type = types.bool;
+      default = false;
+      description = "set a static ip of 10.0.2.15";
+    };
   };
   config = {
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
