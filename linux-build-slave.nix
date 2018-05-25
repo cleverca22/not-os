@@ -1,4 +1,4 @@
-{ sshKeyFile ? null, memory ? 512 }:
+{ sshKeyFile ? null, memory ? 512, rootsize ? "10g" }:
 # usage: nix-build linux-build-slave.nix -I nixpkgs=https://github.com/nixos/nixpkgs/archive/c29d2fde74d.tar.gz --arg sshKeyFile ~/.ssh/id_rsa.pub
 let
   pkgs = import <nixpkgs> {};
@@ -27,11 +27,12 @@ let
   };
   runvm = pkgs.writeScript "runner" ''
     #!${pkgs.stdenv.shell}
+    set -e
 
     export PATH=${pkgs.coreutils}/bin/:$PATH
 
     rm rootdisk.img
-    truncate -s 50g rootdisk.img
+    truncate -s ${rootsize} rootdisk.img
 
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name buildSlave -m ${toString memory} \
       -drive index=0,id=drive0,file=${eval.config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
