@@ -121,6 +121,7 @@ let
     done
 
     root=/dev/vda
+    realroot=tmpfs
     for o in $(cat /proc/cmdline); do
       case $o in
         systemConfig=*)
@@ -142,21 +143,35 @@ let
           tftp -g -r "$3" "$2"
           root=/root.squashfs
           ;;
+        realroot=*)
+          set -- $(IFS==; echo $o)
+          realroot=$2
+          ;;
       esac
     done
 
     ${lib.optionalString enablePlymouth ''plymouth display-message --text="mounting things"''}
 
-    mount -t tmpfs root /mnt/ -o size=1G || exec ${shell}
+    if [ $realroot = tmpfs ]; then
+      mount -t tmpfs root /mnt/ -o size=1G || exec ${shell}
+    else
+      mount $realroot /mnt || exec ${shell}
+    fi
     chmod 755 /mnt/
     mkdir -p /mnt/nix/store/
 
     
+      cat /proc/partitions
+      lsblk
+      lspci
+      lsmod
     ${if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
     mount $root /mnt/nix/.ro-store -t squashfs
-    mount tmpfs -t tmpfs /mnt/nix/.overlay-store -o size=1G
+    if [ $realroot = $1 ]; then
+      mount tmpfs -t tmpfs /mnt/nix/.overlay-store -o size=1G
+    fi
     mkdir -pv /mnt/nix/.overlay-store/work /mnt/nix/.overlay-store/rw
     modprobe overlay
     mount -t overlay overlay -o lowerdir=/mnt/nix/.ro-store,upperdir=/mnt/nix/.overlay-store/rw,workdir=/mnt/nix/.overlay-store/work /mnt/nix/store
