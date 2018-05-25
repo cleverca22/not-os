@@ -28,6 +28,8 @@ let
   runvm = pkgs.writeScript "runner" ''
     #!${pkgs.stdenv.shell}
 
+    export PATH=${pkgs.coreutils}/bin/:$PATH
+
     rm rootdisk.img
     truncate -s 50g rootdisk.img
 
