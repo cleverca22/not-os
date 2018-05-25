@@ -1,4 +1,6 @@
 { lib, pkgs, config, ... }:
+
+with lib;
 let
   modules = pkgs.makeModulesClosure {
     rootModules = config.boot.initrd.availableKernelModules ++ config.boot.initrd.kernelModules;
@@ -152,6 +154,7 @@ let
 
     ${lib.optionalString enablePlymouth ''plymouth display-message --text="mounting things"''}
 
+    ${config.not-os.preMount}
     if [ $realroot = tmpfs ]; then
       mount -t tmpfs root /mnt/ -o size=1G || exec ${shell}
     else
@@ -193,6 +196,12 @@ let
   };
 in
 {
+  options = {
+    not-os.preMount = mkOption {
+      type = types.lines;
+      default = "";
+    };
+  };
   config = {
     system.build.bootStage1 = bootStage1;
     system.build.initialRamdisk = initialRamdisk;

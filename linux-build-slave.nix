@@ -6,10 +6,15 @@ let
     inherit configuration;
     system = "x86_64-linux";
   };
-  configuration = { ... }: {
+  configuration = { pkgs, ... }: {
     imports = [ ./qemu.nix ];
-    not-os.nix = true;
-    not-os.simpleStaticIp = true;
+    not-os = {
+      nix = true;
+      simpleStaticIp = true;
+      preMount = ''
+        ${pkgs.e2fsprogs}/bin/mkfs.ext4 $realroot || true
+      '';
+    };
     boot.kernelParams = [ "realroot=/dev/vdb" ];
     boot.initrd.kernelModules = [ "ext4" "crc32c_generic" ];
     environment.systemPackages = with pkgs; [ ];
@@ -23,12 +28,8 @@ let
   runvm = pkgs.writeScript "runner" ''
     #!${pkgs.stdenv.shell}
 
-    export PATH=${pkgs.e2fsprogs}/bin/:$PATH
-
     rm rootdisk.img
     truncate -s 50g rootdisk.img
-
-    mkfs.ext4 rootdisk.img
 
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name buildSlave -m ${toString memory} \
       -drive index=0,id=drive0,file=${eval.config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
