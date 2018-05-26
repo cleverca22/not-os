@@ -31,7 +31,7 @@ let
 
     export PATH=${pkgs.coreutils}/bin/:$PATH
 
-    rm rootdisk.img
+    if [ -f rootdisk.img ]; then rm rootdisk.img; fi
     truncate -s ${rootsize} rootdisk.img
 
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name buildSlave -m ${toString memory} \
