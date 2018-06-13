@@ -41,6 +41,7 @@ let
       copy_bin_and_libs $BIN
     done
 
+    copy_bin_and_libs ${pkgs.file}/bin/file
     copy_bin_and_libs ${pkgs.dhcpcd}/bin/dhcpcd
 
     # Copy ld manually since it isn't detected correctly
@@ -158,12 +159,11 @@ let
     if [ $realroot = tmpfs ]; then
       mount -t tmpfs root /mnt/ -o size=1G || exec ${shell}
     else
-      mount $realroot /mnt || exec ${shell}
+      mount $realroot -t iso9660 /mnt || exec ${shell}
     fi
     chmod 755 /mnt/
     mkdir -p /mnt/nix/store/
 
-    
       cat /proc/partitions
       lsblk
       lspci
@@ -187,6 +187,8 @@ let
     plymouth --newroot=/mnt
     plymouth update-root-fs --new-root-dir=/mnt --read-write
     ''}
+
+    ip link
 
     exec env -i $(type -P switch_root) /mnt/ $sysconfig/init
     exec ${shell}
