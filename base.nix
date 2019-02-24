@@ -116,11 +116,11 @@ with lib;
     system.build.dist = pkgs.runCommand "not-os-dist" {} ''
       mkdir $out
       cp ${config.system.build.squashfs} $out/root.squashfs
-      cp ${config.system.build.kernel}/*zImage $out/kernel
+      cp ${config.system.build.kernel}/*Image $out/kernel
       cp ${config.system.build.initialRamdisk}/initrd $out/initrd
       echo "${builtins.unsafeDiscardStringContext (toString config.boot.kernelParams)}" > $out/command-line
     '';
-    
+
     system.activationScripts.users = ''
       # dummy to make setup-etc happy
     '';
