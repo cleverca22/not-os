@@ -201,6 +201,10 @@ in
       type = types.lines;
       default = "";
     };
+    boot.initrd.enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
   };
   config = {
     system.build.bootStage1 = bootStage1;
