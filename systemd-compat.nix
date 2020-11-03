@@ -7,6 +7,8 @@ with lib;
     # TODO, it just silently ignores all systemd services
     systemd.services = mkOption {
     };
+    systemd.user = mkOption {
+    };
   };
   config = {
   };
