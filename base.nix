@@ -32,6 +32,18 @@ with lib;
       default = false;
       description = "set a static ip of 10.0.2.15";
     };
+    networking.timeServers = mkOption {
+      default = [
+        "0.nixos.pool.ntp.org"
+        "1.nixos.pool.ntp.org"
+        "2.nixos.pool.ntp.org"
+        "3.nixos.pool.ntp.org"
+      ];
+      type = types.listOf types.str;
+      description = ''
+        The set of NTP servers from which to synchronise.
+      '';
+    };
   };
   config = {
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
