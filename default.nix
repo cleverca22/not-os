@@ -18,10 +18,10 @@ let
       (nixpkgs + "/nixos/modules/system/etc/etc.nix")
       (nixpkgs + "/nixos/modules/system/activation/activation-script.nix")
       (nixpkgs + "/nixos/modules/misc/nixpkgs.nix")
-      <nixpkgs/nixos/modules/system/boot/kernel.nix>
-      <nixpkgs/nixos/modules/misc/assertions.nix>
-      <nixpkgs/nixos/modules/misc/lib.nix>
-      <nixpkgs/nixos/modules/config/sysctl.nix>
+      (nixpkgs + "/nixos/modules/system/boot/kernel.nix")
+      (nixpkgs + "/nixos/modules/misc/assertions.nix")
+      (nixpkgs + "/nixos/modules/misc/lib.nix")
+      (nixpkgs + "/nixos/modules/config/sysctl.nix")
       ./ipxe.nix
       ./systemd-compat.nix
       pkgsModule
