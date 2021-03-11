@@ -141,7 +141,7 @@ with lib;
       unset activationScript
     '';
     # nix-build -A squashfs && ls -lLh result
-    system.build.squashfs = pkgs.callPackage <nixpkgs/nixos/lib/make-squashfs.nix> {
+    system.build.squashfs = pkgs.callPackage (pkgs.path + "/nixos/lib/make-squashfs.nix") {
       storeContents = [ config.system.build.toplevel ];
     };
   };
