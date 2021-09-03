@@ -110,7 +110,7 @@ with lib;
       "ssh/ssh_host_ed25519_key" = { mode = "0600"; source = ./ssh/ssh_host_ed25519_key; };
     };
     boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
-    boot.kernelPackages = if pkgs.system == "armv7l-linux" then pkgs.linuxPackages_rpi1 else pkgs.linuxPackages;
+    boot.kernelPackages = lib.mkDefault (if pkgs.system == "armv7l-linux" then pkgs.linuxPackages_rpi1 else pkgs.linuxPackages);
     system.build.earlyMountScript = pkgs.writeScript "dummy" ''
     '';
     system.build.runvm = pkgs.writeScript "runner" ''
