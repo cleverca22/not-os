@@ -4,11 +4,6 @@ with lib;
 
 {
   options = {
-    system.build = mkOption {
-      internal = true;
-      default = {};
-      description = "Attribute set of derivations used to setup the system.";
-    };
     boot.isContainer = mkOption {
       type = types.bool;
       default = false;
