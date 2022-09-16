@@ -44,7 +44,7 @@ with lib;
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
     nixpkgs.config = {
       packageOverrides = self: {
-        utillinux = self.utillinux.override { systemd = null; };
+        utillinux = self.utillinux.override { systemd = null; systemdSupport = false; };
         dhcpcd = self.dhcpcd.override { udev = null; };
         linux_rpixxx = self.linux_rpi.override {
           extraConfig = ''
