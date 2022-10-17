@@ -6,7 +6,7 @@ let
     _file = ./default.nix;
     key = _file;
     config = {
-      nixpkgs.localSystem = { inherit system; };
+      nixpkgs.system = pkgs.lib.mkDefault system;
     };
   };
   baseModules = [
@@ -15,6 +15,7 @@ let
       ./stage-1.nix
       ./stage-2.nix
       ./runit.nix
+      ./make-iso.nix
       (nixpkgs + "/nixos/modules/system/etc/etc.nix")
       (nixpkgs + "/nixos/modules/system/activation/activation-script.nix")
       (nixpkgs + "/nixos/modules/misc/nixpkgs.nix")
