@@ -1,12 +1,26 @@
-{ configuration ? import ./configuration.nix, nixpkgs ? <nixpkgs>, extraModules ? [], system ? builtins.currentSystem, platform ? null }:
+{ configuration ? import ./configuration.nix
+, nixpkgs ? <nixpkgs>
+, extraModules ? []
+, system ? builtins.currentSystem
+, platform ? null
+, crossSystem ? null }:
 
 let
   pkgs = import nixpkgs { inherit system; platform = platform; config = {}; };
-  pkgsModule = rec {
+  pkgsModule = {config, ... }: {
     _file = ./default.nix;
-    key = _file;
+    key = ./default.nix;
     config = {
-      nixpkgs.localSystem = { inherit system; };
+      nixpkgs.pkgs = (import nixpkgs {
+        inherit system;
+        #crossSystem = (import <nixpkgs/lib>).systems.examples.aarch64-multiplatform;
+        config = config.nixpkgs.config;
+      });
+      nixpkgs.localSystem = {
+        inherit system;
+      } // pkgs.lib.optionalAttrs (crossSystem != null) {
+        inherit crossSystem;
+      };
     };
   };
   baseModules = [

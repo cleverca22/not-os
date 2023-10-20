@@ -39,6 +39,22 @@ with lib;
         The set of NTP servers from which to synchronise.
       '';
     };
+    system.systemBuilderArgs = mkOption {
+      type = types.attrsOf types.unspecified;
+      internal = true;
+      default = {};
+      description = lib.mdDoc ''
+        `lib.mkDerivation` attributes that will be passed to the top level system builder.
+      '';
+    };
+    system.systemBuilderCommands = mkOption {
+      type = types.lines;
+      internal = true;
+      default = "";
+      description = ''
+        This code will be added to the builder creating the system store path.
+      '';
+    };
   };
   config = {
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
