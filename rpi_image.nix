@@ -30,4 +30,15 @@
   nixpkgs.config.packageOverrides = pkgs: {
     linux_rpi = pkgs.callPackage ./linux-rpi.nix {};
   };
+  nixpkgs.overlays = [
+    (self: super: {
+      libuv = super.libuv.overrideAttrs (old: {
+        doCheck = false;
+      });
+      elfutils = super.elfutils.overrideAttrs (old: {
+        doCheck = false;
+        doInstallCheck = false;
+      });
+    })
+  ];
 }
