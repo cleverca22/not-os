@@ -64,7 +64,7 @@ in
     '';
     "service/rngd/run".source = pkgs.writeScript "rngd" ''
       #!/bin/sh
-      export PATH=$PATH:${pkgs.rng_tools}/bin
+      export PATH=$PATH:${pkgs.rng-tools}/bin
       exec rngd -r /dev/hwrng
     '';
     "service/nix/run".source = pkgs.writeScript "nix" ''
