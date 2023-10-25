@@ -39,6 +39,9 @@
         doCheck = false;
         doInstallCheck = false;
       });
+      systemd = super.systemd.overrideAttrs (old: {
+        withEfi = false;
+      });
     })
   ];
 }
