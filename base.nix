@@ -110,7 +110,7 @@ with lib;
         hosts:     files  dns   myhostname mymachines
         networks:  files dns
       '';
-      "services".source = pkgs.iana_etc + "/etc/services";
+      "services".source = pkgs.iana-etc + "/etc/services";
       group.text = ''
         root:x:0:
         nixbld:x:30000:nixbld1,nixbld10,nixbld2,nixbld3,nixbld4,nixbld5,nixbld6,nixbld7,nixbld8,nixbld9
@@ -149,6 +149,7 @@ with lib;
     system.activationScripts.groups = ''
       # dummy to make setup-etc happy
     '';
+    system.activationScripts.etc = stringAfter [ "users" "groups" ] config.system.build.etcActivationCommands;
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n
     system.build.toplevel = pkgs.runCommand "not-os" {

@@ -35,12 +35,12 @@ let
     truncate -s ${rootsize} rootdisk.img
 
     exec ${pkgs.qemu_kvm}/bin/qemu-kvm -name buildSlave -m ${toString memory} \
-      -drive index=0,id=drive0,file=${eval.config.system.build.squashfs},readonly,media=cdrom,format=raw,if=virtio \
+      -drive index=0,id=drive0,file=${eval.config.system.build.squashfs},readonly=on,media=cdrom,format=raw,if=virtio \
       -drive index=1,id=drive1,file=rootdisk.img,format=raw,if=virtio \
       -kernel ${eval.config.system.build.kernel}/bzImage -initrd ${eval.config.system.build.initialRamdisk}/initrd -nographic \
       -append "console=ttyS0 ${toString eval.config.boot.kernelParams} quiet panic=-1" -no-reboot \
-      -net nic,vlan=0,model=virtio \
-      -net user,vlan=0,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22 \
+      -net nic,model=virtio \
+      -net user,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,hostfwd=tcp::2222-:22 \
       -device virtio-rng-pci
   '';
 in {

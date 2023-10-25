@@ -165,7 +165,6 @@ let
 
     
       cat /proc/partitions
-      lsblk
       lspci
       lsmod
     ${if config.not-os.nix then ''
