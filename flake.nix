@@ -8,8 +8,7 @@
   outputs = { self, nixpkgs, firmware }: {
     packages.armv7l-linux = let
       platforms = (import nixpkgs { config = {}; }).platforms;
-    in {
-      rpi_image = (import ./default.nix {
+      eval = (import ./default.nix {
         extraModules = [
           ./rpi_image.nix
           { system.build.rpi_firmware = firmware; }
@@ -17,7 +16,11 @@
         platform = system: platforms.raspberrypi2;
         system = "armv7l-linux";
         inherit nixpkgs;
-      }).config.system.build.rpi_image;
+      });
+    in {
+      rpi_image = eval.config.system.build.rpi_image;
+      toplevel = eval.config.system.build.toplevel;
+      inherit eval;
     };
   };
 }

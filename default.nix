@@ -15,6 +15,7 @@ let
         inherit system;
         #crossSystem = (import <nixpkgs/lib>).systems.examples.aarch64-multiplatform;
         config = config.nixpkgs.config;
+        overlays = config.nixpkgs.overlays;
       });
       nixpkgs.localSystem = {
         inherit system;

@@ -1,11 +1,12 @@
 { config, lib, pkgs, ... }:
 
 # based heavily on https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/config/system-path.nix
+#  crosser = if pkgs.stdenv ? cross then (x: if x ? crossDrv then x.crossDrv else x) else (x: x);
 
 with lib;
 
 let
-  requiredPackages = with pkgs; [ utillinux coreutils iproute iputils procps curl bashInteractive runit ];
+  requiredPackages = with pkgs; [ utillinux coreutils iproute iputils procps bashInteractive runit ];
 in
 {
   options = {

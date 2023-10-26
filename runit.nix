@@ -25,7 +25,7 @@ EOF
   '';
 in
 {
-  environment.systemPackages = [ compat pkgs.socat ];
+  environment.systemPackages = [ compat ];
   environment.etc = {
     "runit/1".source = pkgs.writeScript "1" ''
       #!${pkgs.stdenv.shell}

@@ -17,13 +17,13 @@
     cd $out
     cp ${config_txt} config.txt
     cp ${cmdline} cmdline.txt
-    cp -s ${config.system.build.kernel}/*zImage kernel7.img
-    cp -s ${config.system.build.squashfs} root.squashfs
+    cp ${config.system.build.kernel}/*zImage kernel7.img
+    cp ${config.system.build.squashfs} root.squashfs
     cp ${firm}/boot/bcm2710-rpi-3-b.dtb bcm2710-rpi-3-b.dtb
     cp -r ${firm}/boot/overlays overlays
-    cp -s ${firm}/boot/start.elf start.elf
+    cp ${firm}/boot/start.elf start.elf
     cp ${firm}/boot/fixup.dat fixup.dat
-    cp -s ${config.system.build.initialRamdisk}/initrd initrd
+    cp ${config.system.build.initialRamdisk}/initrd initrd
     ls -ltrhL
   '';
   environment.systemPackages = [ pkgs.strace ];
@@ -39,9 +39,10 @@
         doCheck = false;
         doInstallCheck = false;
       });
-      systemd = super.systemd.overrideAttrs (old: {
-        withEfi = false;
-      });
+      systemd = super.systemd.override { withEfi = false; };
+      util-linux = super.util-linux.override { systemdSupport = false; };
+      procps = super.procps.override { withSystemd = false; };
+      nix = super.nix.override { enableDocumentation = false; };
     })
   ];
 }
