@@ -27,8 +27,9 @@
     ls -ltrhL
   '';
   system.build.rpi_image_tar = pkgs.runCommand "dist.tar" {} ''
-    mkdir $out
+    mkdir -p $out/nix-support
     tar -cvf $out/dist.tar ${config.system.build.rpi_image}
+    echo "file binary-dist $out/dist.tar" >> $out/nix-support/hydra-build-products
   '';
   environment.systemPackages = [ pkgs.strace ];
   nixpkgs.config.packageOverrides = pkgs: {
