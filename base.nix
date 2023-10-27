@@ -22,6 +22,11 @@ with lib;
       type = types.bool;
       description = "enable nix-daemon and a writeable store";
     };
+    not-os.rngd = mkOption {
+      type = types.bool;
+      description = "enable rngd";
+      default = false;
+    };
     not-os.simpleStaticIp = mkOption {
       type = types.bool;
       default = false;
