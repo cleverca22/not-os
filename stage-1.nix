@@ -24,7 +24,7 @@ let
   dhcpcd = pkgs.dhcpcd.override { udev = null; };
   extraUtils = pkgs.runCommandCC "extra-utils"
   {
-    buildInputs = [ pkgs.nukeReferences ];
+    nativeBuildInputs = [ pkgs.nukeReferences ];
     allowedReferences = [ "out" ];
   } ''
     set +o pipefail
