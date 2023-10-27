@@ -19,8 +19,12 @@
       });
     in {
       rpi_image = eval.config.system.build.rpi_image;
+      rpi_image_tar = eval.config.system.build.rpi_image_tar;
       toplevel = eval.config.system.build.toplevel;
       inherit eval;
+    };
+    hydraJobs = {
+      armv7l-linux.rpi_image_tar = self.packages.armv7l-linux.rpi_image_tar;
     };
   };
 }

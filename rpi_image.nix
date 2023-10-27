@@ -26,6 +26,10 @@
     cp ${config.system.build.initialRamdisk}/initrd initrd
     ls -ltrhL
   '';
+  system.build.rpi_image_tar = pkgs.runCommand "dist.tar" {} ''
+    mkdir $out
+    tar -cvf $out/dist.tar ${config.system.build.rpi_image}
+  '';
   environment.systemPackages = [ pkgs.strace ];
   nixpkgs.config.packageOverrides = pkgs: {
     linux_rpi = pkgs.callPackage ./linux-rpi.nix {};
