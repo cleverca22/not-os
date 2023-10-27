@@ -2,7 +2,7 @@
 
 {
   imports = [ ./qemu.nix ];
-  not-os.nix = true;
+  not-os.nix = false;
   environment.systemPackages = [ pkgs.utillinux ];
   environment.etc = {
     "ssh/authorized_keys.d/root" = {
