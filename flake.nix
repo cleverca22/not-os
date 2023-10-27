@@ -14,7 +14,7 @@
           { system.build.rpi_firmware = firmware; }
         ];
         platform = system: platforms.raspberrypi2;
-        system = "armv7l-linux";
+        crossSystem.system = "armv7l-linux";
         inherit nixpkgs;
       });
     in {

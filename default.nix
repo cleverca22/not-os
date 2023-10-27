@@ -12,7 +12,7 @@ let
     key = ./default.nix;
     config = {
       nixpkgs.pkgs = (import nixpkgs {
-        inherit system;
+        inherit system crossSystem;
         #crossSystem = (import <nixpkgs/lib>).systems.examples.aarch64-multiplatform;
         config = config.nixpkgs.config;
         overlays = config.nixpkgs.overlays;
