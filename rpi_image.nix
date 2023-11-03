@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 {
+  imports = [ ./arm32-cross-fixes.nix ];
   nixpkgs.system = "armv7l-linux";
   system.build.rpi_image = let
     config_txt = pkgs.writeText "config.txt" ''
@@ -35,19 +36,4 @@
   nixpkgs.config.packageOverrides = pkgs: {
     linux_rpi = pkgs.callPackage ./linux-rpi.nix {};
   };
-  nixpkgs.overlays = [
-    (self: super: {
-      libuv = super.libuv.overrideAttrs (old: {
-        doCheck = false;
-      });
-      elfutils = super.elfutils.overrideAttrs (old: {
-        doCheck = false;
-        doInstallCheck = false;
-      });
-      systemd = super.systemd.override { withEfi = false; };
-      util-linux = super.util-linux.override { systemdSupport = false; };
-      procps = super.procps.override { withSystemd = false; };
-      nix = super.nix.override { enableDocumentation = false; };
-    })
-  ];
 }

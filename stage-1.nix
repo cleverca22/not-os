@@ -163,10 +163,7 @@ let
     chmod 755 /mnt/
     mkdir -p /mnt/nix/store/
 
-    
-      cat /proc/partitions
-      lspci
-      lsmod
+
     ${if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store

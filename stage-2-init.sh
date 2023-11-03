@@ -1,4 +1,4 @@
-#!@shell@
+#!@runtimeShell@
 
 systemConfig=@systemConfig@
 export PATH=@path@/bin/

@@ -27,6 +27,7 @@ with lib;
       src = ./stage-2-init.sh;
       isExecutable = true;
       path = config.system.path;
+      inherit (pkgs) runtimeShell;
     };
   };
 }

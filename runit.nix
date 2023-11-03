@@ -29,7 +29,7 @@ in
   environment.etc = lib.mkMerge [
     {
       "runit/1".source = pkgs.writeScript "1" ''
-        #!${pkgs.stdenv.shell}
+        #!${pkgs.runtimeShell}
         ${lib.optionalString config.not-os.simpleStaticIp ''
         ip addr add 10.0.2.15 dev eth0
         ip link set eth0 up
@@ -51,27 +51,27 @@ in
         ${if true then "" else "${pkgs.dhcpcd}/sbin/dhcpcd"}
       '';
       "runit/2".source = pkgs.writeScript "2" ''
-        #!/bin/sh
+        #!${pkgs.runtimeShell}
         cat /proc/uptime
         exec runsvdir -P /etc/service
       '';
       "runit/3".source = pkgs.writeScript "3" ''
-        #!/bin/sh
+        #!${pkgs.runtimeShell}
         echo and down we go
       '';
       "service/sshd/run".source = pkgs.writeScript "sshd_run" ''
-        #!/bin/sh
+        #!${pkgs.runtimeShell}
         ${pkgs.openssh}/bin/sshd -f ${sshd_config}
       '';
       "service/nix/run".source = pkgs.writeScript "nix" ''
-        #!/bin/sh
+        #!${pkgs.runtimeShell}
         nix-store --load-db < /nix/store/nix-path-registration
         nix-daemon
       '';
     }
     (lib.mkIf config.not-os.rngd {
       "service/rngd/run".source = pkgs.writeScript "rngd" ''
-        #!/bin/sh
+        #!${pkgs.runtimeShell}
         export PATH=$PATH:${pkgs.rng-tools}/bin
         exec rngd -r /dev/hwrng
       '';
