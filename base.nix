@@ -84,11 +84,11 @@ with lib;
     };
     environment.etc = {
       "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
-        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.stdenv.shell}); do if test -d $i; then echo $i; fi; done)
+        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.runtimeShell}); do if test -d $i; then echo $i; fi; done)
         cat > $out << EOF
         build-use-sandbox = true
         build-users-group = nixbld
-        build-sandbox-paths = /bin/sh=${pkgs.stdenv.shell} $(echo $extraPaths)
+        build-sandbox-paths = /bin/sh=${pkgs.runtimeShell} $(echo $extraPaths)
         build-max-jobs = 1
         build-cores = 4
         EOF

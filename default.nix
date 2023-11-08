@@ -41,11 +41,13 @@ let
       ./systemd-compat.nix
       pkgsModule
   ];
+  other = {
+    _module.check = true;
+    _module.args = {};
+  };
   evalConfig = modules: pkgs.lib.evalModules {
     prefix = [];
-    check = true;
-    modules = modules ++ baseModules ++ [ pkgsModule ] ++ extraModules;
-    args = {};
+    modules = modules ++ baseModules ++ [ pkgsModule other ] ++ extraModules;
   };
 in
 rec {

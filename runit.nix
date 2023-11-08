@@ -37,7 +37,7 @@ in
         ip  route add default via 10.0.2.2 dev eth0
         ''}
         mkdir /bin/
-        ln -s ${pkgs.stdenv.shell} /bin/sh
+        ln -s ${pkgs.runtimeShell} /bin/sh
 
         ${lib.optionalString (config.networking.timeServers != []) ''
           ${pkgs.ntp}/bin/ntpdate ${toString config.networking.timeServers}
