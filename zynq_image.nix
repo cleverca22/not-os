@@ -3,12 +3,32 @@
 let
   # dont use overlays for the qemu, it causes a lot of wasted time on recompiles
   x86pkgs = import pkgs.path { system = "x86_64-linux"; };
-  customKernel = pkgs.linux.override {
+  crosspkgs = import pkgs.path {
+    system = "x86_64-linux";
+    crossSystem = {
+      system = "armv7l-linux";
+      linux-kernel = {
+        name = "zynq";
+        baseConfig = "multi_v7_defconfig";
+        target = "uImage";
+        installTarget = "uImage";
+        autoModules = false;
+        DTB = true;
+        makeFlags = [ "LOADADDR=0x8000" ];
+      };
+    };
+  };
+  customKernel = (crosspkgs.linux.override {
     extraConfig = ''
       OVERLAY_FS y
     '';
-  };
-  customKernelPackages = pkgs.linuxPackagesFor customKernel;
+  }).overrideAttrs (oldAttrs: {
+    postInstall = ''
+      cp arch/arm/boot/uImage $out
+      ${oldAttrs.postInstall}
+    '';
+  });
+  customKernelPackages = crosspkgs.linuxPackagesFor customKernel;
 in {
   imports = [ ./arm32-cross-fixes.nix ];
   boot.kernelPackages = customKernelPackages;
@@ -30,9 +50,9 @@ in {
         -serial /dev/null \
         -serial stdio \
         -display none \
-        -dtb $base/zynq-zc702.dtb \
-        -kernel $base/zImage \
-        -initrd $base/initrd \
+        -dtb $base/devicetree.dtb \
+        -kernel $base/uImage \
+        -initrd $base/uramdisk.image.gz \
         -drive file=/tmp/root.squashfs,if=sd,format=raw \
         -append "${cmdline}"
     '';
@@ -44,9 +64,9 @@ in {
     mkdir $out
     cd $out
     cp -s ${config.system.build.squashfs} root.squashfs
-    cp -s ${config.system.build.kernel}/*zImage .
-    cp -s ${config.system.build.initialRamdisk}/initrd initrd
-    cp -s ${config.system.build.kernel}/dtbs/zynq-zc702.dtb .
+    cp -s ${config.system.build.kernel}/uImage .
+    cp -s ${config.system.build.uRamdisk}/initrd uramdisk.image.gz
+    cp -s ${config.system.build.kernel}/dtbs/zynq-zc706.dtb devicetree.dtb
     ln -sv ${config.system.build.toplevel} toplevel
     cp $qemuScriptPath qemu-script
     chmod +x qemu-script
