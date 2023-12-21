@@ -164,7 +164,9 @@ let
     mkdir -p /mnt/nix/store/
 
 
-    ${if config.not-os.nix then ''
+    ${if config.not-os.sd && config.not-os.nix then ''
+    mount $root /mnt
+    '' else if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
     mount $root /mnt/nix/.ro-store -t squashfs

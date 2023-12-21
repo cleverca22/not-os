@@ -27,6 +27,11 @@ with lib;
       description = "enable rngd";
       default = false;
     };
+    not-os.sd = mkOption {
+      type = types.bool;
+      default = false;
+      description = "enable sd image support";
+    };
     not-os.simpleStaticIp = mkOption {
       type = types.bool;
       default = false;

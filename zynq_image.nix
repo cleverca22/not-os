@@ -32,6 +32,7 @@ in {
   boot.kernelPackages = customKernelPackages;
   nixpkgs.system = "armv7l-linux";
   networking.hostName = "zynq";
+  not-os.sd = true;
   system.build.zynq_image = pkgs.runCommand "zynq_image" {
     preferLocalBuild = true;
   } ''
