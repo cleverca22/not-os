@@ -21,6 +21,11 @@ with lib;
         type = types.str;
        };
     };
+    networking.hostName = mkOption {
+      default = "";
+      type = types.strMatching
+        "^$|^[[:alnum:]]([[:alnum:]_-]{0,61}[[:alnum:]])?$";
+    };
   };
   config = {
     system.build.bootStage2 = pkgs.substituteAll {

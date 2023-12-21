@@ -190,6 +190,11 @@ let
   initialRamdisk = pkgs.makeInitrd {
     contents = [ { object = bootStage1; symlink = "/init"; } ];
   };
+  # Use for zynq_image
+  uRamdisk =  pkgs.makeInitrd {
+    makeUInitrd = true;
+    contents = [ { object = bootStage1; symlink = "/init"; } ];
+  };
 in
 {
   options = {
@@ -205,6 +210,7 @@ in
   config = {
     system.build.bootStage1 = bootStage1;
     system.build.initialRamdisk = initialRamdisk;
+    system.build.uRamdisk = uRamdisk;
     system.build.extraUtils = extraUtils;
     boot.initrd.availableKernelModules = [ ];
     boot.initrd.kernelModules = [ "tun" "loop" "squashfs" ] ++ (lib.optional config.not-os.nix "overlay");
