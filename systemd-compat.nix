@@ -9,6 +9,8 @@ with lib;
     };
     systemd.user = mkOption {
     };
+    systemd.tmpfiles = mkOption {
+    };
   };
   config = {
   };
