@@ -33,6 +33,7 @@ in {
   nixpkgs.system = "armv7l-linux";
   networking.hostName = "zynq";
   not-os.sd = true;
+  not-os.simpleStaticIp = true;
   system.build.zynq_image = pkgs.runCommand "zynq_image" {
     preferLocalBuild = true;
   } ''
