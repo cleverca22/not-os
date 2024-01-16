@@ -46,7 +46,7 @@ in {
     ln -sv ${config.system.build.toplevel} toplevel
   '';
   environment = {
-    systemPackages = with pkgs; [ strace inetutils ];
+    systemPackages = with pkgs; [ inetutils wget ];
     etc = {
       "service/getty/run".source = pkgs.writeShellScript "getty" ''
         hostname ${config.networking.hostName}
