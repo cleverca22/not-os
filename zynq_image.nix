@@ -50,7 +50,7 @@ in {
     etc = {
       "service/getty/run".source = pkgs.writeShellScript "getty" ''
         hostname ${config.networking.hostName}
-        agetty ttyPS0 115200
+        exec setsid agetty ttyPS0 115200
       '';
       "pam.d/other".text = ''
         auth     sufficient pam_permit.so
