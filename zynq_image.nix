@@ -20,6 +20,12 @@ let
   customKernel = (crosspkgs.linux.override {
     extraConfig = ''
       OVERLAY_FS y
+      MEDIA_SUPPORT n
+      FB n
+      DRM n
+      SOUND n
+      SQUASHFS n
+      BACKLIGHT_CLASS_DEVICE n
     '';
   }).overrideAttrs (oa: {
     postInstall = ''
