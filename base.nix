@@ -98,6 +98,8 @@ with lib;
         build-cores = 4
         EOF
       '';
+      "ssl/certs/ca-certificates.crt".source = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+      "ssl/certs/ca-bundle.crt".source = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       bashrc.text = "export PATH=/run/current-system/sw/bin";
       profile.text = "export PATH=/run/current-system/sw/bin";
       "resolv.conf".text = "nameserver 10.0.2.3";
