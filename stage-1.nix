@@ -117,11 +117,6 @@ let
     plymouth --show-splash
     ''}
 
-
-    for x in ${lib.concatStringsSep " " config.boot.initrd.kernelModules}; do
-      modprobe $x
-    done
-
     root=/dev/vda
     realroot=tmpfs
     for o in $(cat /proc/cmdline); do
