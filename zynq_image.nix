@@ -52,7 +52,7 @@ in {
     ln -sv ${config.system.build.toplevel} toplevel
   '';
   environment = {
-    systemPackages = with pkgs; [ inetutils wget ];
+    systemPackages = with pkgs; [ inetutils wget nano ];
     etc = {
       "service/getty/run".source = pkgs.writeShellScript "getty" ''
         hostname ${config.networking.hostName}
