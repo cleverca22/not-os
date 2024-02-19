@@ -104,6 +104,7 @@ with lib;
       profile.text = ''
         export PATH=/run/current-system/sw/bin
         export EDITOR=nano
+        export NIX_PATH="nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels"
       '';
       "resolv.conf".text = "nameserver 10.0.2.3";
       passwd.text = ''
