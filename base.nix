@@ -91,11 +91,15 @@ with lib;
       "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
         extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.runtimeShell}); do if test -d $i; then echo $i; fi; done)
         cat > $out << EOF
-        build-use-sandbox = true
+        auto-optimise-store = true
         build-users-group = nixbld
-        build-sandbox-paths = /bin/sh=${pkgs.runtimeShell} $(echo $extraPaths)
-        build-max-jobs = 1
-        build-cores = 4
+        cores = 0
+        extra-sandbox-paths = /bin/sh=${pkgs.runtimeShell} $(echo $extraPaths)
+        max-jobs = auto
+        sandbox = true
+        substituters = https://cache.armv7l.xyz
+        trusted-public-keys = cache.armv7l.xyz-1:kBY/eGnBAYiqYfg0fy0inWhshUo+pGFM3Pj7kIkmlBk=
+        trusted-users = root
         EOF
       '';
       "ssl/certs/ca-certificates.crt".source = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
