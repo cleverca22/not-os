@@ -57,6 +57,23 @@ in
       '';
       "runit/3".source = pkgs.writeScript "3" ''
         #!${pkgs.runtimeShell}
+        echo Waiting for services to stop...
+        sv force-stop /etc/service/*
+        sv exit /etc/service/*
+
+        echo Sending TERM signal to processes...
+        pkill --inverse -s0,1 -TERM
+        sleep 1
+        echo Sending KILL signal to processes...
+        pkill --inverse -s0,1 -KILL
+
+        echo Unmounting filesystems, disabling swap...
+        swapoff -a
+        umount -r -a -t nosysfs,noproc,nodevtmpfs,notmpfs
+        echo Remounting rootfs read-only...
+        mount -o remount,ro /
+
+        sync
         echo and down we go
       '';
       "service/sshd/run".source = pkgs.writeScript "sshd_run" ''
