@@ -26,6 +26,12 @@ let
       SOUND n
       SQUASHFS n
       BACKLIGHT_CLASS_DEVICE n
+      FPGA y
+      FPGA_BRIDGE y
+      FPGA_REGION y
+      OF_FPGA_REGION y
+      FPGA_MGR_ZYNQ_FPGA y
+      OF_OVERLAY y
     '';
   }).overrideAttrs (oa: {
     postInstall = ''
