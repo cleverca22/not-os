@@ -3,6 +3,16 @@
 with lib;
 let
   customKernel = (pkgs.linux_6_6.override {
+    kernelPatches = [
+      ({
+        name = "xilinx-configfs-overlays";
+        patch = ./xilinx-configfs-overlays.patch;
+      })
+      ({
+        name = "xilinx-fpga-manager";
+        patch = ./xilinx-fpga-manager.patch;
+      })
+    ];
     extraConfig = ''
       OVERLAY_FS y
       MEDIA_SUPPORT n
@@ -17,6 +27,7 @@ let
       OF_FPGA_REGION y
       FPGA_MGR_ZYNQ_FPGA y
       OF_OVERLAY y
+      OF_CONFIGFS y
     '';
   }).overrideAttrs (oa: {
     postInstall = ''
