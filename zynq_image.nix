@@ -2,22 +2,7 @@
 
 with lib;
 let
-  crosspkgs = import pkgs.path {
-    system = "x86_64-linux";
-    crossSystem = {
-      system = "armv7l-linux";
-      linux-kernel = {
-        name = "zynq";
-        baseConfig = "multi_v7_defconfig";
-        target = "uImage";
-        installTarget = "uImage";
-        autoModules = false;
-        DTB = true;
-        makeFlags = [ "LOADADDR=0x8000" ];
-      };
-    };
-  };
-  customKernel = (crosspkgs.linux.override {
+  customKernel = (pkgs.linux_6_6.override {
     extraConfig = ''
       OVERLAY_FS y
       MEDIA_SUPPORT n
@@ -35,11 +20,13 @@ let
     '';
   }).overrideAttrs (oa: {
     postInstall = ''
-      cp arch/arm/boot/uImage $out
+      if [ -e arch/arm/boot/uImage ]; then
+        cp arch/arm/boot/uImage $out
+      fi
       ${oa.postInstall}
     '';
   });
-  customKernelPackages = crosspkgs.linuxPackagesFor customKernel;
+  customKernelPackages = pkgs.linuxPackagesFor customKernel;
 in {
   imports = [ ./arm32-cross-fixes.nix ];
   boot.kernelPackages = customKernelPackages;
