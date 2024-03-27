@@ -19,4 +19,7 @@ mount -t tmpfs tmpfs /dev/shm
 
 $systemConfig/activate
 
+# Run any user-specified commands.
+@runtimeShell@ @postBootCommands@
+
 exec runit

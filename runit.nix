@@ -65,7 +65,6 @@ in
       '';
       "service/nix/run".source = pkgs.writeScript "nix" ''
         #!${pkgs.runtimeShell}
-        nix-store --load-db < /nix/store/nix-path-registration
         nix-daemon
       '';
     }

@@ -117,11 +117,6 @@ let
     plymouth --show-splash
     ''}
 
-
-    for x in ${lib.concatStringsSep " " config.boot.initrd.kernelModules}; do
-      modprobe $x
-    done
-
     root=/dev/vda
     realroot=tmpfs
     for o in $(cat /proc/cmdline); do
@@ -164,7 +159,9 @@ let
     mkdir -p /mnt/nix/store/
 
 
-    ${if config.not-os.nix then ''
+    ${if config.not-os.sd && config.not-os.nix then ''
+    mount $root /mnt
+    '' else if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
     mount $root /mnt/nix/.ro-store -t squashfs
@@ -190,6 +187,11 @@ let
   initialRamdisk = pkgs.makeInitrd {
     contents = [ { object = bootStage1; symlink = "/init"; } ];
   };
+  # Use for zynq_image
+  uRamdisk =  pkgs.makeInitrd {
+    makeUInitrd = true;
+    contents = [ { object = bootStage1; symlink = "/init"; } ];
+  };
 in
 {
   options = {
@@ -205,6 +207,7 @@ in
   config = {
     system.build.bootStage1 = bootStage1;
     system.build.initialRamdisk = initialRamdisk;
+    system.build.uRamdisk = uRamdisk;
     system.build.extraUtils = extraUtils;
     boot.initrd.availableKernelModules = [ ];
     boot.initrd.kernelModules = [ "tun" "loop" "squashfs" ] ++ (lib.optional config.not-os.nix "overlay");
