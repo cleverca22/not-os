@@ -2,7 +2,6 @@
 
 let
   sshd_config = pkgs.writeText "sshd_config" ''
-    HostKey /etc/ssh/ssh_host_rsa_key
     HostKey /etc/ssh/ssh_host_ed25519_key
     Port 22
     PidFile /run/sshd.pid
@@ -30,6 +29,13 @@ in
     {
       "runit/1".source = pkgs.writeScript "1" ''
         #!${pkgs.runtimeShell}
+
+        ED25519_KEY="/etc/ssh/ssh_host_ed25519_key"
+
+        if [ ! -f $ED25519_KEY ]; then
+          ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $ED25519_KEY -N ""
+        fi
+
         ${lib.optionalString config.not-os.simpleStaticIp ''
         ip addr add 10.0.2.15 dev eth0
         ip link set eth0 up
