@@ -188,6 +188,10 @@ let
     exec ${shell}
   '';
   initialRamdisk = pkgs.makeInitrd {
+    compressor =
+      if lib.versionAtLeast config.boot.kernelPackages.kernel.version "5.9"
+      then "zstd"
+      else "gzip";
     contents = [ { object = bootStage1; symlink = "/init"; } ];
   };
 in
