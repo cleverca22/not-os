@@ -17,6 +17,8 @@ mount -t devpts devpts /dev/pts
 mount -t tmpfs tmpfs /run
 mount -t tmpfs tmpfs /dev/shm
 
+ln -s /proc/self/fd /dev/fd
+
 $systemConfig/activate
 
 exec runit
