@@ -67,10 +67,12 @@ in
       '';
       "service/sshd/run".source = pkgs.writeScript "sshd_run" ''
         #!${pkgs.runtimeShell}
-        ${pkgs.openssh}/bin/sshd -f ${sshd_config}
+        echo Start ssh daemon
+        ${pkgs.openssh}/bin/sshd -D -e -f ${sshd_config}
       '';
       "service/nix/run".source = pkgs.writeScript "nix" ''
         #!${pkgs.runtimeShell}
+        echo Start nix daemon
         nix-store --load-db < /nix/store/nix-path-registration
         nix-daemon
       '';
@@ -78,6 +80,7 @@ in
     (lib.mkIf config.not-os.rngd {
       "service/rngd/run".source = pkgs.writeScript "rngd" ''
         #!${pkgs.runtimeShell}
+        ecoh Start rng daemon
         export PATH=$PATH:${pkgs.rng-tools}/bin
         exec rngd -r /dev/hwrng
       '';
