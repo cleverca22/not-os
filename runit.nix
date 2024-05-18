@@ -42,8 +42,15 @@ in
         ip route add 10.0.2.0/24 dev eth0
         ip  route add default via 10.0.2.2 dev eth0
         ''}
+
         mkdir /bin/
         ln -s ${pkgs.runtimeShell} /bin/sh
+
+        ${lib.optionalString config.not-os.dhcp ''
+          mkdir -p /var/db/dhcpcd /var/run/dhcpcd
+          touch /etc/dhcpcd.conf
+          ${pkgs.dhcpcd}/sbin/dhcpcd --oneshot
+        ''}
 
         ${lib.optionalString (config.networking.timeServers != []) ''
           ${pkgs.ntp}/bin/ntpdate ${toString config.networking.timeServers}
@@ -54,7 +61,6 @@ in
 
         touch /etc/runit/stopit
         chmod 0 /etc/runit/stopit
-        ${if true then "" else "${pkgs.dhcpcd}/sbin/dhcpcd"}
       '';
       "runit/2".source = pkgs.writeScript "2" ''
         #!${pkgs.runtimeShell}
@@ -77,6 +83,13 @@ in
         nix-daemon
       '';
     }
+    (lib.mkIf config.not-os.dhcp {
+      "service/dhcp/run".source = pkgs.writeScript "dhcp_run" ''
+        #!${pkgs.runtimeShell}
+        echo Start dhcp client
+        ${pkgs.dhcpcd}/sbin/dhcpcd --background
+      '';
+    })
     (lib.mkIf config.not-os.rngd {
       "service/rngd/run".source = pkgs.writeScript "rngd" ''
         #!${pkgs.runtimeShell}

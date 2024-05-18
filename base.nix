@@ -22,6 +22,10 @@ with lib;
       type = types.bool;
       description = "enable nix-daemon and a writeable store";
     };
+    not-os.dhcp = mkOption {
+      type = types.bool;
+      description = "enable dhcp initial discovery on startup";
+    };
     not-os.rngd = mkOption {
       type = types.bool;
       description = "enable rngd";
@@ -99,6 +103,7 @@ with lib;
       passwd.text = ''
         root:x:0:0:System administrator:/root:/run/current-system/sw/bin/bash
         sshd:x:498:65534:SSH privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
+        dhcpcd:x:499:65534:DHCP Client privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
         toxvpn:x:1010:65534::/var/lib/toxvpn:/run/current-system/sw/bin/nologin
         nixbld1:x:30001:30000:Nix build user 1:/var/empty:/run/current-system/sw/bin/nologin
         nixbld2:x:30002:30000:Nix build user 2:/var/empty:/run/current-system/sw/bin/nologin
