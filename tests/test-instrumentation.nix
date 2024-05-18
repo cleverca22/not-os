@@ -1,6 +1,12 @@
-{ pkgs, ... }:
+{ pkgs,... }: let
+  qemuSerialDevice =
+    if with pkgs.stdenv.hostPlatform; isx86 || isLoongArch64 || isMips64 || isRiscV then "ttyS0"
+    else if (with pkgs.stdenv.hostPlatform; isAarch || isPower) then "ttyAMA0"
+    else throw "Unknown QEMU serial device for system '${pkgs.stdenv.hostPlatform.system}'";
+in 
 
 {
+  imports = [ ../qemu.nix ];
   environment.etc = {
     "service/backdoor/run".source = pkgs.writeScript "backdoor_run" ''
       #!/bin/sh
@@ -18,7 +24,7 @@
 
       cd /tmp
       exec < /dev/hvc0 > /dev/hvc0
-      while ! exec 2> /dev/ttyS0; do sleep 0.1; done
+      while ! exec 2> /dev/${qemuSerialDevice}; do sleep 0.1; done
       echo "connecting to host..." >&2
       stty -F /dev/hvc0 raw -echo # prevent nl -> cr/nl conversion
       echo
@@ -26,5 +32,8 @@
     '';
   };
   boot.initrd.availableKernelModules = [ "virtio_console" ];
-  boot.kernelParams = [ "panic=-1" ];
+  boot.kernelParams = [
+     "console=${qemuSerialDevice}"
+     "panic=-1"
+  ]; 
 }

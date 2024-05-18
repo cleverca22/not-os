@@ -161,6 +161,7 @@ let
       mount $realroot /mnt || exec ${shell}
     fi
     chmod 755 /mnt/
+    ${config.not-os.postMount}
     mkdir -p /mnt/nix/store/
 
 
@@ -188,12 +189,20 @@ let
     exec ${shell}
   '';
   initialRamdisk = pkgs.makeInitrd {
+    compressor =
+      if lib.versionAtLeast config.boot.kernelPackages.kernel.version "5.9"
+      then "zstd"
+      else "gzip";
     contents = [ { object = bootStage1; symlink = "/init"; } ];
   };
 in
 {
   options = {
     not-os.preMount = mkOption {
+      type = types.lines;
+      default = "";
+    };
+    not-os.postMount = mkOption {
       type = types.lines;
       default = "";
     };

@@ -22,6 +22,10 @@ with lib;
       type = types.bool;
       description = "enable nix-daemon and a writeable store";
     };
+    not-os.dhcp = mkOption {
+      type = types.bool;
+      description = "enable dhcp initial discovery on startup";
+    };
     not-os.rngd = mkOption {
       type = types.bool;
       description = "enable rngd";
@@ -31,6 +35,11 @@ with lib;
       type = types.bool;
       default = false;
       description = "set a static ip of 10.0.2.15";
+    };
+    not-os.extraStartup = mkOption {
+      type = types.nullOr types.lines;
+      default = null;
+      description = "extra lines to run during startup";
     };
     networking.timeServers = mkOption {
       default = [
@@ -65,7 +74,7 @@ with lib;
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
     nixpkgs.config = {
       packageOverrides = self: {
-        utillinux = self.utillinux.override { systemd = null; systemdSupport = false; };
+        util-linux = self.util-linux.override { systemd = null; systemdSupport = false; };
         dhcpcd = self.dhcpcd.override { udev = null; };
         linux_rpixxx = self.linux_rpi.override {
           extraConfig = ''
@@ -99,6 +108,7 @@ with lib;
       passwd.text = ''
         root:x:0:0:System administrator:/root:/run/current-system/sw/bin/bash
         sshd:x:498:65534:SSH privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
+        dhcpcd:x:499:65534:DHCP Client privilege separation user:/var/empty:/run/current-system/sw/bin/nologin
         toxvpn:x:1010:65534::/var/lib/toxvpn:/run/current-system/sw/bin/nologin
         nixbld1:x:30001:30000:Nix build user 1:/var/empty:/run/current-system/sw/bin/nologin
         nixbld2:x:30002:30000:Nix build user 2:/var/empty:/run/current-system/sw/bin/nologin
@@ -120,10 +130,6 @@ with lib;
         root:x:0:
         nixbld:x:30000:nixbld1,nixbld10,nixbld2,nixbld3,nixbld4,nixbld5,nixbld6,nixbld7,nixbld8,nixbld9
       '';
-      "ssh/ssh_host_rsa_key.pub".source = ./ssh/ssh_host_rsa_key.pub;
-      "ssh/ssh_host_rsa_key" = { mode = "0600"; source = ./ssh/ssh_host_rsa_key; };
-      "ssh/ssh_host_ed25519_key.pub".source = ./ssh/ssh_host_ed25519_key.pub;
-      "ssh/ssh_host_ed25519_key" = { mode = "0600"; source = ./ssh/ssh_host_ed25519_key; };
     };
     boot.kernelParams = [ "systemConfig=${config.system.build.toplevel}" ];
     boot.kernelPackages = lib.mkDefault (if pkgs.system == "armv7l-linux" then pkgs.linuxPackages_rpi1 else pkgs.linuxPackages);
@@ -155,6 +161,23 @@ with lib;
       # dummy to make setup-etc happy
     '';
     system.activationScripts.etc = stringAfter [ "users" "groups" ] config.system.build.etcActivationCommands;
+    # Re-apply deprecated var value due to systemd preference in recent nixpkgs
+    # See https://github.com/NixOS/nixpkgs/commit/59e37267556eb917146ca3110ab7c96905b9ffbd
+    system.activationScripts.var = lib.mkForce ''
+      # Various log/runtime directories.
+
+      mkdir -p /var/tmp
+      chmod 1777 /var/tmp
+
+      # Empty, immutable home directory of many system accounts.
+      mkdir -p /var/empty
+      # Make sure it's really empty
+      ${pkgs.e2fsprogs}/bin/chattr -f -i /var/empty || true
+      find /var/empty -mindepth 1 -delete
+      chmod 0555 /var/empty
+      chown root:root /var/empty
+      ${pkgs.e2fsprogs}/bin/chattr -f +i /var/empty || true
+    '';
 
     # nix-build -A system.build.toplevel && du -h $(nix-store -qR result) --max=0 -BM|sort -n
     system.build.toplevel = pkgs.runCommand "not-os" {
