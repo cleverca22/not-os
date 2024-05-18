@@ -6,6 +6,7 @@
 in 
 
 {
+  imports = [ ../qemu.nix ];
   environment.etc = {
     "service/backdoor/run".source = pkgs.writeScript "backdoor_run" ''
       #!/bin/sh
