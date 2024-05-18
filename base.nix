@@ -36,6 +36,11 @@ with lib;
       default = false;
       description = "set a static ip of 10.0.2.15";
     };
+    not-os.extraStartup = mkOption {
+      type = types.nullOr types.lines;
+      default = null;
+      description = "extra lines to run during startup";
+    };
     networking.timeServers = mkOption {
       default = [
         "0.nixos.pool.ntp.org"

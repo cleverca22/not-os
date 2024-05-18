@@ -56,6 +56,8 @@ in
           ${pkgs.ntp}/bin/ntpdate ${toString config.networking.timeServers}
         ''}
 
+        ${if config.not-os.extraStartup != null then config.not-os.extraStartup else ""}
+
         # disable DPMS on tty's
         echo -ne "\033[9;0]" > /dev/tty0
 

@@ -161,6 +161,7 @@ let
       mount $realroot /mnt || exec ${shell}
     fi
     chmod 755 /mnt/
+    ${config.not-os.postMount}
     mkdir -p /mnt/nix/store/
 
 
@@ -198,6 +199,10 @@ in
 {
   options = {
     not-os.preMount = mkOption {
+      type = types.lines;
+      default = "";
+    };
+    not-os.postMount = mkOption {
       type = types.lines;
       default = "";
     };
