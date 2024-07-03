@@ -89,7 +89,7 @@ with lib;
     };
     environment.etc = {
       "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
-        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.runtimeShell}); do if test -d $i; then echo $i; fi; done)
+        extraPaths=$(for i in $(cat ${pkgs.writeClosure [ pkgs.bash ]}); do if test -d $i; then echo $i; fi; done)
         cat > $out << EOF
         auto-optimise-store = true
         build-users-group = nixbld
