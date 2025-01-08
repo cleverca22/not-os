@@ -159,8 +159,17 @@ let
     mkdir -p /mnt/nix/store/
 
 
-    ${if config.not-os.sd && config.not-os.nix then ''
-    mount $root /mnt
+    ${if config.not-os.sd && config.not-os.nix then
+    if config.not-os.readOnly then ''
+      mkdir -p /mnt.ro /mnt.overlay
+      mount -o ro $root /mnt.ro
+      mount -t tmpfs -o size=1G tmpfs /mnt.overlay
+      mkdir -p /mnt.overlay/upper /mnt.overlay/work
+
+      mount -t overlay overlay -o lowerdir=/mnt.ro,upperdir=/mnt.overlay/upper,workdir=/mnt.overlay/work /mnt
+    '' else ''
+      # Read-write mount for development
+      mount $root /mnt
     '' else if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store

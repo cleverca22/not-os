@@ -32,6 +32,11 @@ with lib;
       default = false;
       description = "enable sd image support";
     };
+    not-os.readOnly = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Mount root filesystem as read-only with overlay for writes";
+    };
     not-os.simpleStaticIp = mkOption {
       type = types.bool;
       default = false;
