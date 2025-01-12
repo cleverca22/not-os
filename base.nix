@@ -22,6 +22,10 @@ with lib;
       type = types.bool;
       description = "enable nix-daemon and a writeable store";
     };
+    nix.enable = mkOption {
+      type = types.bool;
+      default = config.not-os.nix;
+    };
     not-os.rngd = mkOption {
       type = types.bool;
       description = "enable rngd";
