@@ -31,6 +31,16 @@ with lib;
       description = "enable rngd";
       default = false;
     };
+    not-os.sd = mkOption {
+      type = types.bool;
+      default = false;
+      description = "enable sd image support";
+    };
+    not-os.readOnly = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Mount root filesystem as read-only with overlay for writes";
+    };
     not-os.simpleStaticIp = mkOption {
       type = types.bool;
       default = false;
@@ -88,17 +98,25 @@ with lib;
     };
     environment.etc = {
       "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
-        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.runtimeShell}); do if test -d $i; then echo $i; fi; done)
+        extraPaths=$(for i in $(cat ${pkgs.writeClosure [ pkgs.bash ]}); do if test -d $i; then echo $i; fi; done)
         cat > $out << EOF
-        build-use-sandbox = true
+        auto-optimise-store = true
         build-users-group = nixbld
-        build-sandbox-paths = /bin/sh=${pkgs.runtimeShell} $(echo $extraPaths)
-        build-max-jobs = 1
-        build-cores = 4
+        cores = 0
+        extra-sandbox-paths = /bin/sh=${pkgs.runtimeShell} $(echo $extraPaths)
+        max-jobs = auto
+        sandbox = true
+        trusted-users = root
         EOF
       '';
+      "ssl/certs/ca-certificates.crt".source = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+      "ssl/certs/ca-bundle.crt".source = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       bashrc.text = "export PATH=/run/current-system/sw/bin";
-      profile.text = "export PATH=/run/current-system/sw/bin";
+      profile.text = ''
+        export PATH=/run/current-system/sw/bin
+        export EDITOR=nano
+        export NIX_PATH="nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos:nixos-config=/etc/nixos/configuration.nix:/nix/var/nix/profiles/per-user/root/channels"
+      '';
       "resolv.conf".text = "nameserver 10.0.2.3";
       passwd.text = ''
         root:x:0:0:System administrator:/root:/run/current-system/sw/bin/bash
