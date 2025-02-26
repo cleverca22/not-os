@@ -158,22 +158,41 @@ let
     chmod 755 /mnt/
     mkdir -p /mnt/nix/store/
 
-
     ${if config.not-os.sd && config.not-os.nix then ''
-    mount $root /mnt
-    '' else if config.not-os.nix then ''
-    # make the store writeable
-    mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
-    mount $root /mnt/nix/.ro-store -t squashfs
-    if [ $realroot = $1 ]; then
-      mount tmpfs -t tmpfs /mnt/nix/.overlay-store -o size=1G
-    fi
-    mkdir -pv /mnt/nix/.overlay-store/work /mnt/nix/.overlay-store/rw
-    modprobe overlay
-    mount -t overlay overlay -o lowerdir=/mnt/nix/.ro-store,upperdir=/mnt/nix/.overlay-store/rw,workdir=/mnt/nix/.overlay-store/work /mnt/nix/store
-    '' else ''
-    # readonly store
-    mount $root /mnt/nix/store/ -t squashfs
+      mkdir -p /boot
+      mount -t vfat -o ro /dev/mmcblk0p1 /boot
+      USE_READONLY=1
+      if [ -e /boot/fs_mode_rw ]; then
+        echo "Found fs_mode_rw file, enabling read-write mode"
+        USE_READONLY=0
+      fi
+      if [ "$USE_READONLY" = "1" ]; then
+        mkdir -p /mnt.ro /mnt.overlay
+        mount -o ro $root /mnt.ro
+        mount -t tmpfs -o size=1G tmpfs /mnt.overlay
+        mkdir -p /mnt.overlay/upper /mnt.overlay/work
+        mount -t overlay overlay -o lowerdir=/mnt.ro,upperdir=/mnt.overlay/upper,workdir=/mnt.overlay/work /mnt
+        mkdir -p /mnt/boot
+      else
+        mount $root /mnt
+        mkdir -p /mnt/boot
+      fi
+      mount --move /boot /mnt/boot
+    ''
+    else if config.not-os.nix then ''
+      # make the store writeable
+      mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
+      mount $root /mnt/nix/.ro-store -t squashfs
+      if [ $realroot = $1 ]; then
+        mount tmpfs -t tmpfs /mnt/nix/.overlay-store -o size=1G
+      fi
+      mkdir -pv /mnt/nix/.overlay-store/work /mnt/nix/.overlay-store/rw
+      modprobe overlay
+      mount -t overlay overlay -o lowerdir=/mnt/nix/.ro-store,upperdir=/mnt/nix/.overlay-store/rw,workdir=/mnt/nix/.overlay-store/work /mnt/nix/store
+    ''
+    else ''
+      # readonly store
+      mount $root /mnt/nix/store/ -t squashfs
     ''}
 
     ${lib.optionalString enablePlymouth ''

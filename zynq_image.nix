@@ -5,6 +5,8 @@ let
   customKernel = (pkgs.linux_6_6.override {
     extraConfig = ''
       OVERLAY_FS y
+      NLS_CODEPAGE_437 y
+      NLS_ISO8859_1 y
       MEDIA_SUPPORT n
       FB n
       DRM n
