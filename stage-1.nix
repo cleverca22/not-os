@@ -169,7 +169,7 @@ let
       if [ "$USE_READONLY" = "1" ]; then
         mkdir -p /mnt.ro /mnt.overlay
         mount -o ro $root /mnt.ro
-        mount -t tmpfs -o size=1G tmpfs /mnt.overlay
+        mount -t tmpfs -o size=256M tmpfs /mnt.overlay
         mkdir -p /mnt.overlay/upper /mnt.overlay/work
         mount -t overlay overlay -o lowerdir=/mnt.ro,upperdir=/mnt.overlay/upper,workdir=/mnt.overlay/work /mnt
         mkdir -p /mnt/boot
