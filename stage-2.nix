@@ -36,14 +36,16 @@ with lib;
     };
   };
   config = {
-    system.build.bootStage2 = pkgs.substituteAll {
+    system.build.bootStage2 = pkgs.replaceVarsWith {
       src = ./stage-2-init.sh;
       isExecutable = true;
-      path = config.system.path;
-      inherit (pkgs) runtimeShell;
-      postBootCommands = pkgs.writeText "local-cmds" ''
-        ${config.boot.postBootCommands}
-      '';
+      replacements = {
+        path = config.system.path;
+        inherit (pkgs) runtimeShell;
+        postBootCommands = pkgs.writeText "local-cmds" ''
+          ${config.boot.postBootCommands}
+        '';
+      };
     };
   };
 }
