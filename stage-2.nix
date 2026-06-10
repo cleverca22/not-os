@@ -20,6 +20,14 @@ with lib;
         example = "256m";
         type = types.str;
        };
+      postBootCommands = mkOption {
+        default = "";
+        example = "rm -f /var/log/messages";
+        type = types.lines;
+        description = ''
+          Shell commands to be executed just before runit is started.
+        '';
+      };
     };
   };
   config = {
@@ -31,6 +39,9 @@ with lib;
         inherit (pkgs) runtimeShell;
         # null keeps @systemConfig@ in the file; toplevel fills it in later.
         systemConfig = null;
+        postBootCommands = pkgs.writeShellScript "local-cmds" ''
+          ${config.boot.postBootCommands}
+        '';
       };
     };
   };
