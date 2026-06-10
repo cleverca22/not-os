@@ -69,7 +69,7 @@ with lib;
     environment.systemPackages = lib.optional config.not-os.nix pkgs.nix;
     nixpkgs.config = {
       packageOverrides = self: {
-        dhcpcd = self.dhcpcd.override { udev = null; };
+        dhcpcd = self.dhcpcd.override { withUdev = false; };
       };
     };
     environment.etc = {
