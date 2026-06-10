@@ -70,24 +70,11 @@ with lib;
     nixpkgs.config = {
       packageOverrides = self: {
         dhcpcd = self.dhcpcd.override { udev = null; };
-        linux_rpixxx = self.linux_rpi.override {
-          extraConfig = ''
-            DEBUG_LL y
-            EARLY_PRINTK y
-            DEBUG_BCM2708_UART0 y
-            ARM_APPENDED_DTB n
-            ARM_ATAG_DTB_COMPAT n
-            ARCH_BCM2709 y
-            BCM2708_GPIO y
-            BCM2708_NOL2CACHE y
-            BCM2708_SPIDEV y
-          '';
-        };
       };
     };
     environment.etc = {
       "nix/nix.conf".source = pkgs.runCommand "nix.conf" {} ''
-        extraPaths=$(for i in $(cat ${pkgs.writeReferencesToFile pkgs.runtimeShell}); do if test -d $i; then echo $i; fi; done)
+        extraPaths=$(for i in $(cat ${pkgs.writeClosure [ pkgs.bash ]}); do if test -d $i; then echo $i; fi; done)
         cat > $out << EOF
         build-use-sandbox = true
         build-users-group = nixbld
