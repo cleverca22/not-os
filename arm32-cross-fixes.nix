@@ -11,7 +11,13 @@
       systemd = super.systemd.override { withEfi = false; };
       util-linux = super.util-linux.override { systemdSupport = false; };
       procps = super.procps.override { withSystemd = false; };
-      nix = super.nix.override { enableDocumentation = false; };
+      # Building nix's manual pulls in mdbook (Rust). We don't need the manual,
+      # so swap it for an empty stub to keep mdbook out of the build.
+      nix = super.nix.override {
+        nix-manual = self.runCommand "nix-manual" { outputs = [ "out" "man" ]; } ''
+          mkdir -p "$out" "$man"
+        '';
+      };
     })
   ];
 }

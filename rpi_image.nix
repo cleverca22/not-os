@@ -47,7 +47,7 @@
   nixpkgs.overlays = [
     (self: super: {
       openssh = super.openssh.override { withFIDO = false; withKerberos = false; };
-      util-linux = super.util-linux.override { pamSupport=false; capabilitiesSupport=false; ncursesSupport=false; systemdSupport=false; nlsSupport=false; translateManpages=false; };
+      util-linux = super.util-linux.override { pamSupport=false; withLastlog=false; capabilitiesSupport=false; ncursesSupport=false; systemdSupport=false; nlsSupport=false; translateManpages=false; };
       utillinuxCurses = self.util-linux;
       utillinuxMinimal = self.util-linux;
     })
