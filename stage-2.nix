@@ -23,11 +23,15 @@ with lib;
     };
   };
   config = {
-    system.build.bootStage2 = pkgs.substituteAll {
+    system.build.bootStage2 = pkgs.replaceVarsWith {
       src = ./stage-2-init.sh;
       isExecutable = true;
-      path = config.system.path;
-      inherit (pkgs) runtimeShell;
+      replacements = {
+        path = config.system.path;
+        inherit (pkgs) runtimeShell;
+        # null keeps @systemConfig@ in the file; toplevel fills it in later.
+        systemConfig = null;
+      };
     };
   };
 }
