@@ -21,7 +21,6 @@ let
     };
     #patches2 = [ ./fix2.patch ./udev3.patch ];
   });
-  dhcpcd = pkgs.dhcpcd.override { udev = null; };
   extraUtils = pkgs.runCommandCC "extra-utils"
   {
     nativeBuildInputs = [ pkgs.nukeReferences ];
