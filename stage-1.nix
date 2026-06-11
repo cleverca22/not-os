@@ -186,11 +186,17 @@ let
     exec env -i $(type -P switch_root) /mnt/ $sysconfig/init
     exec ${shell}
   '';
+  initrdContents = [
+    { object = bootStage1; symlink = "/init"; }
+    { object = modules; symlink = "/lib/modules-store"; }
+  ];
   initialRamdisk = pkgs.makeInitrd {
-    contents = [
-      { object = bootStage1; symlink = "/init"; }
-      { object = modules; symlink = "/lib/modules-store"; }
-    ];
+    contents = initrdContents;
+  };
+  # The same initrd, wrapped in the format u-boot expects (e.g. zynq).
+  uRamdisk = pkgs.makeInitrd {
+    makeUInitrd = true;
+    contents = initrdContents;
   };
 in
 {
@@ -207,6 +213,7 @@ in
   config = {
     system.build.bootStage1 = bootStage1;
     system.build.initialRamdisk = initialRamdisk;
+    system.build.uRamdisk = uRamdisk;
     system.build.extraUtils = extraUtils;
     boot.initrd.availableKernelModules = [ ];
     boot.initrd.kernelModules = [ "tun" "loop" "squashfs" ] ++ (lib.optional config.not-os.nix "overlay");
