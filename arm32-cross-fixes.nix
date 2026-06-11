@@ -18,6 +18,8 @@
           mkdir -p "$out" "$man"
         '';
       };
+      # Drop ubootTools' EFI scripts so they don't pull Rust into the build.
+      ubootTools = super.ubootTools.override { pythonScriptsToInstall = { }; };
     })
   ];
 }
