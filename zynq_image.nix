@@ -13,6 +13,7 @@ in {
   imports = [ ./arm32-cross-fixes.nix ];
   boot.kernelPackages = customKernelPackages;
   nixpkgs.system = "armv7l-linux";
+  networking.hostName = "zynq";
   system.build.zynq_image = let
     cmdline = "root=/dev/mmcblk0 console=ttyPS0,115200n8 systemConfig=${builtins.unsafeDiscardStringContext config.system.build.toplevel}";
     qemuScript = ''

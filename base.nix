@@ -48,6 +48,12 @@ with lib;
         The set of NTP servers from which to synchronise.
       '';
     };
+    networking.hostName = mkOption {
+      default = "";
+      type = types.strMatching
+        "^$|^[[:alnum:]]([[:alnum:]_-]{0,61}[[:alnum:]])?$";
+      description = "The name of the machine. Leave empty to not set one.";
+    };
     system.systemBuilderArgs = mkOption {
       type = types.attrsOf types.unspecified;
       internal = true;
