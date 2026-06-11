@@ -5,7 +5,7 @@ let
   modules = pkgs.makeModulesClosure {
     rootModules = config.boot.initrd.availableKernelModules ++ config.boot.initrd.kernelModules;
     allowMissing = true;
-    kernel = config.system.build.kernel;
+    kernel = config.system.build.kernel.modules;
     firmware = config.hardware.firmware;
   };
   plymouth = (pkgs.plymouth.override {
@@ -187,7 +187,10 @@ let
     exec ${shell}
   '';
   initialRamdisk = pkgs.makeInitrd {
-    contents = [ { object = bootStage1; symlink = "/init"; } ];
+    contents = [
+      { object = bootStage1; symlink = "/init"; }
+      { object = modules; symlink = "/lib/modules-store"; }
+    ];
   };
 in
 {
