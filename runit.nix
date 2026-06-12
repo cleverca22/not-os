@@ -37,6 +37,10 @@ in
           ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $ED25519_KEY -N ""
         fi
 
+        ${lib.optionalString (config.networking.hostName != "") ''
+        echo ${config.networking.hostName} > /proc/sys/kernel/hostname
+        ''}
+
         ${lib.optionalString config.not-os.simpleStaticIp ''
         ip addr add 10.0.2.15 dev eth0
         ip link set eth0 up
