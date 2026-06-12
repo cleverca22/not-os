@@ -54,11 +54,6 @@ in {
     patchShebangs qemu-script
     ls -ltrh
   '';
-  system.build.rpi_image_tar = pkgs.runCommand "dist.tar" {} ''
-    mkdir -p $out/nix-support
-    tar -cvf $out/dist.tar ${config.system.build.rpi_image}
-    echo "file binary-dist $out/dist.tar" >> $out/nix-support/hydra-build-products
-  '';
   environment.systemPackages = [ pkgs.strace ];
   environment.etc."service/getty/run".source = pkgs.writeShellScript "getty" ''
     agetty ttyPS0 115200
