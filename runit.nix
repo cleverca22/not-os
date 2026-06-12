@@ -33,6 +33,7 @@ in
         ED25519_KEY="/etc/ssh/ssh_host_ed25519_key"
 
         if [ ! -f $ED25519_KEY ]; then
+          mkdir -p /etc/ssh
           ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $ED25519_KEY -N ""
         fi
 
