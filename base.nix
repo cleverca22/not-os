@@ -31,6 +31,11 @@ with lib;
       description = "enable rngd";
       default = false;
     };
+    not-os.sd = mkOption {
+      type = types.bool;
+      default = false;
+      description = "boot from an SD card (vfat /boot + ext4 root) instead of a squashfs store";
+    };
     not-os.simpleStaticIp = mkOption {
       type = types.bool;
       default = false;

@@ -93,7 +93,11 @@ in
       '';
       "service/nix/run".source = pkgs.writeScript "nix" ''
         #!${pkgs.runtimeShell}
-        nix-store --load-db < /nix/store/nix-path-registration
+        # Load the shipped store paths into the db, once: only if the db isn't
+        # built yet, and only if the registration file is present (absent on SD).
+        if [ ! -e /nix/var/nix/db/db.sqlite ] && [ -e /nix/store/nix-path-registration ]; then
+          nix-store --load-db < /nix/store/nix-path-registration
+        fi
         nix-daemon
       '';
     }
