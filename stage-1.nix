@@ -163,7 +163,26 @@ let
     mkdir -p /mnt/nix/store/
 
 
-    ${if config.not-os.nix then ''
+    ${if config.not-os.sd && config.not-os.nix then ''
+    # SD boot: a vfat /boot partition plus a full ext4 root.
+    # Read-only by default (ext4 lower + tmpfs overlay),
+    # writeable when the file /boot/fs_mode_rw exists.
+    mkdir -p /boot
+    mount -t vfat -o ro /dev/mmcblk0p1 /boot
+    if [ -e /boot/fs_mode_rw ]; then
+      echo "found /boot/fs_mode_rw, mounting root read-write"
+      mount $root /mnt
+    else
+      mkdir -p /mnt.ro /mnt.overlay
+      mount -o ro $root /mnt.ro
+      mount -t tmpfs -o size=256M tmpfs /mnt.overlay
+      mkdir -p /mnt.overlay/upper /mnt.overlay/work
+      modprobe overlay
+      mount -t overlay overlay -o lowerdir=/mnt.ro,upperdir=/mnt.overlay/upper,workdir=/mnt.overlay/work /mnt
+    fi
+    mkdir -p /mnt/boot
+    mount --move /boot /mnt/boot
+    '' else if config.not-os.nix then ''
     # make the store writeable
     mkdir -p /mnt/nix/.ro-store /mnt/nix/.overlay-store /mnt/nix/store
     mount $root /mnt/nix/.ro-store -t squashfs
