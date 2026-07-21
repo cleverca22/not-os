@@ -41,6 +41,11 @@ with lib;
       default = false;
       description = "set a static ip of 10.0.2.15";
     };
+    not-os.extraInit = mkOption {
+      type = types.lines;
+      default = "";
+      description = "extra shell commands to run at the end of runit's first script";
+    };
     networking.timeServers = mkOption {
       default = [
         "0.nixos.pool.ntp.org"

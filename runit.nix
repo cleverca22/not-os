@@ -60,6 +60,8 @@ in
         touch /etc/runit/stopit
         chmod 0 /etc/runit/stopit
         ${if true then "" else "${pkgs.dhcpcd}/sbin/dhcpcd"}
+
+        ${config.not-os.extraInit}
       '';
       "runit/2".source = pkgs.writeScript "2" ''
         #!${pkgs.runtimeShell}
